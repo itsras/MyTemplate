@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+	<display-name>ClickToBuy</display-name>
+	<welcome-file-list>
+		<welcome-file>a</welcome-file>
+	</welcome-file-list>
+
+	<servlet>
+		<description>
+		</description>
+		<display-name>myServlet</display-name>
+		<servlet-name>myServlet</servlet-name>
+		<servlet-class>com.sras.client.servlet.ControllerServlet</servlet-class>
+		<init-param>
+			<param-name>org.apache.velocity.properties</param-name>
+			<param-value>/WEB-INF/velocity.properties</param-value>
+		</init-param>
+		<init-param>
+			<param-name>action.mappings</param-name>
+			<param-value>/WEB-INF/action.properties</param-value>
+		</init-param>
+		<init-param>
+			<param-name>log4j-init-file</param-name>
+			<param-value>WEB-INF/classes/log4j.properties</param-value>
+		</init-param>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>myServlet</servlet-name>
+		<url-pattern>/a</url-pattern>
+	</servlet-mapping>
+
+	<filter>
+		<filter-name>LoginFilter</filter-name>
+		<filter-class>com.sras.client.filter.LoginFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>LoginFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+	</filter-mapping>
+
+	<error-page>
+		<exception-type>java.lang.Exception</exception-type>
+		<location>/servlet.html?page=error</location>
+	</error-page>
+
+	<error-page>
+		<error-code>404</error-code>
+		<location>/servlet.html?page=error</location>
+	</error-page>
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/servlet.html?page=error</location>
+	</error-page>
+
+	<mime-mapping>
+		<extension>xls</extension>
+		<mime-type>application/vnd.ms-excel</mime-type>
+	</mime-mapping>
+
+	<!-- don't treat csv file as html -->
+	<mime-mapping>
+		<extension>csv</extension>
+		<mime-type>text/csv</mime-type>
+	</mime-mapping>
+</web-app>

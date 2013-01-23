@@ -1,0 +1,102 @@
+#set ($pageTitle="Login")
+
+<div style="height:720px;background-image:url(./img/login-bg.jpg);background-repeat:no-repeat;background-size: cover;">
+<br>
+	<div style="height:698px; width:50%; float:left;text-align:center;">
+		<font color="white">
+			<h1>$!{productName}!</h1>
+			<p>$!{productCaption}<p>
+		</font>
+	</div>
+	
+	<div class="well well-large" id="signin-div" style="display:none; width:40%; height:50%; float:right; margin-right:15px; ">
+		<form id="signinform" action="${servletPageWithAction}login" method="POST">
+			<div>
+				<div style="float:left"><p class="lead">Sign in</p></div>
+				<div style="float:right">New user? <a href="javascript:showSignup()">Signup</a></div>
+			</div>
+			<br><br><br>
+			<div style="float:left;">
+				<input name="lusername" id="lusername" type="text" value="$!{lusername}" class="input-xlarge validate[required,custom[email]]" placeholder="Email"><br>
+				<input name="password" id="password" type="password" class="input-xlarge validate[required]" placeholder="Password"><br>
+				<label class="checkbox" style="float:left;">
+					<input type="checkbox" name="rememberUserName" id="rememberUserName" value="remember-me"> Keep me logged in
+				</label>
+				<div id="captcha_login_div" style="display:none">
+					<br><br>
+					<div id="login_recaptcha_div" style="display:none;"></div>
+				</div>
+				<br><br>
+				<button type="submit" class="btn btn-danger">Sign in</button>
+				<br><br>
+				<iframe src="http://hub.loginradius.com/Control/PluginSlider.aspx?apikey=ae98216e-fe95-41fb-8262-c89a2f4aa1dd&callback=" width="200" height="70" frameborder="0" scrolling="no"></iframe>
+				<div><a href="#">Can't access your account?</a></div>
+				<div id="login-alert">$!{ErrorText-signin}</div>
+			</div>
+		</form>
+	</div>
+	
+	<div class="well well-large" id="signup-div" style="display:none; width:40%; height:70%; float:right; margin-right:15px">
+		<form id="signupform" action="${servletPageWithAction}signup" method="POST">
+			<div>
+				<div style="float:left"><p class="lead">Sign up</p></div>
+				<div style="float:right">Existing user? <a href="javascript:showSingin()">Signin</a></div>
+			</div>
+			<br>
+			<div style="float:left">
+				<input name="firstName" value="$!{firstName}" type="text" class="span2 validate[required]" placeholder="First Name">
+				<input name="lastName" value="$!{lastName}" type="text" class="span2 validate[required]" placeholder="Last Name">
+				<br>
+				<input name="suserName" id="suserName" value="$!{suserName}" type="text" class="span5 validate[required,custom[email]]" placeholder="Your Email"><br>
+				<input name="suserName1" id="suserName1" value="$!{suserName1}" type="text" class="span5 validate[required,equals[suserName]]" placeholder="Re-enter Email"><br>
+				<input name="spassword" type="password" class="span5 validate[required]" placeholder="Enter Password"><br>
+				<label class="radio" style="float:left;">
+					<input type="radio" name="gender" value="male" #if(${gender} == "male") checked #end style="validate[required]"> Male
+				</label>
+				<label class="radio" style="float:left;">
+					<input type="radio" name="gender" value="female" #if(${gender} == "female") checked #end style="validate[required]"> Female
+				</label>
+				<br><br>
+				<div id="recaptcha_div"></div><br>
+				<div>By clicking on Create account below, you are agreeing to the <a href="#">Terms of Service</a> and The <a href="#">Privacy Policy</a></div><br>
+				<button type="submit" class="btn btn-danger">Create account</button><br><br>
+				<div>$!{ErrorText-signup}</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script>
+	function showSignup()
+	{
+		#addReCaptch("recaptcha_div")
+		$("#signin-div").hide();
+		$("#signup-div").fadeIn('slow');
+	}
+	
+	function showSingin()
+	{
+		#if($showCaptcha)
+			#addReCaptch("login_recaptcha_div")
+			$("#signin-div").height("70%");
+			$("#captcha_login_div").show();
+			$("#login_recaptcha_div").show();
+		#end
+		
+		$("#signup-div").hide();
+		$("#signin-div").fadeIn('slow');
+	}
+	
+	$(document).ready(function(){
+		#if($ErrorText-signup)
+			showSignup();
+		#else
+			showSingin();
+		#end
+		
+		// binds form submission and fields to the validation engine
+		$("#signinform").validationEngine('attach');
+		
+		$("#signupform").validationEngine('attach');
+	});
+</script>

@@ -1,0 +1,106 @@
+#macro (includeBootstrapJs)
+	#if (!$BootstrapJsIncluded)
+		#set ($BootstrapJsIncluded = true)
+		<script type="text/javascript"  src="./js/bootstrap.min.js"></script>
+	#end
+#end
+
+#macro (includeBootstrapCss)	
+	#if (!$BootstrapCssIncluded)
+		#set ($BootstrapCssIncluded = true)	
+		<link rel="stylesheet" type="text/css" href="./css/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="./css/bootstrap-responsive.css">
+		<link rel="stylesheet" type="text/css" href="./css/validationEngine.jquery.css">
+	#end
+#end
+
+#macro (includeJQueryJs)	
+	<script type="text/javascript" src="./js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="./js/jquery.validationEngine.js"></script>
+	<script type="text/javascript" src="./js/jquery.validationEngine-en.js"></script>
+#end
+
+#macro (includeUtilitiesJs)	
+	#if (!$UtilitiesJsIncluded)
+		#set ($UtilitiesJsIncluded = true)	
+		<script type="text/javascript" src="./js/Hashtable.js"></script>
+		<script type="text/javascript" src="./js/recaptcha_ajax.js"></script>
+	#end
+#end
+
+#macro (ajaxrequest $component $url $type $method)
+	<script>
+		$(document).ready(function(){
+			$("${component}").click(function(){
+				$.ajax({
+					url: "${url}",
+					type: "${type}",
+					success: $method
+				});
+			});
+		});
+	</script>
+#end
+
+#macro (addReCaptch $div)
+	Recaptcha.create("6LfPgNsSAAAAAASO2ef1Y4jeOy0kvWSSfIkyVcBo",
+		"$div",
+		{
+		      theme: "clean",
+		      callback: Recaptcha.focus_response_field
+		}
+	);
+#end
+
+
+#macro (showHeader)
+	<div class="navbar" style="position: static;">
+		<div class="navbar-inner" style="height:100px;">
+			<a class="brand" href="#"><h1>${productName}</h1></a>
+			<br>
+			<div class="nav-collapse collapse navbar-inverse-collapse">
+				<ul class="nav">
+					<li class="active"><a href="#">Home</a></li>
+					<li><a href="#">Link</a></li>
+					<li><a href="#">Link</a></li>
+					<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li><a href="#">Action</a></li>
+						<li><a href="#">Another action</a></li>
+						<li><a href="#">Something else here</a></li>
+						<li class="divider"></li>
+						<li class="nav-header">Nav header</li>
+						<li><a href="#">Separated link</a></li>
+						<li><a href="#">One more separated link</a></li>
+					</ul>
+					</li>
+				</ul>
+				#if($userName)
+					<br><br>
+					<div class="brand" style="float:right;">Welcome $userName! &nbsp;&nbsp;<a href="${servletPageWithAction}logout">Logout</a></div>
+				#end					
+			</div><!-- /.nav-collapse -->
+		</div><!-- /navbar-inner -->
+	</div>
+#end
+
+#macro (showFooter)
+		<style>
+			#Footer {
+				padding: 30px 0 44px;
+			}
+		</style>
+		<footer id="Footer">
+			<div style="border-top: 1px solid #CCCCCC;">
+				<center>
+					<span><font color="black">&copy; 2012 ${productName}. All Rights Reserved</span></font><br>
+					<a href="/corp/website/privacy-policy">Privacy Policy</a> |
+					<a href="/corp/website/cookies">Cookie Policy</a> |
+					<a href="/corp/website/terms-of-service">Terms of Service</a> |
+					<a href="/corp/website/site-map">Site Map</a> |
+					<a href="http://www.atre.net" target="_blank">Site Credits</a>
+				</center>
+			</div>
+		</footer>
+#end

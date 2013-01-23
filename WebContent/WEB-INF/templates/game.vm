@@ -1,0 +1,27 @@
+<style>
+	.matched {
+		background-color: #ffddee;
+		border: double 3px #22ff22;
+		margin: 2px;
+	}
+	
+	.selected {
+		background-color: #eeeeee;
+		border: double 3px #000000;
+		margin: 2px;
+	}
+
+	.unselected {
+		margin: 5px;
+	}
+	
+	.card {
+		width: 96px;
+		height: 96px;
+		float: left;
+	}
+</style>
+
+<div id="tiles">
+game...
+</div>

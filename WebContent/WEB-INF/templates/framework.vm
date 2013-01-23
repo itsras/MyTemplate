@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+
+		#set ($pageTitle="Home")
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		#includeJQueryJs()
+		#includeBootstrapCss()
+		#includeBootstrapJs()
+		#includeUtilitiesJs()
+	</head>
+	<body>
+		<div class="container">
+			#if($page != "login.vm")
+				#showHeader()
+			#else
+				<br>
+			#end
+			#parse($body)
+			#showFooter()
+		</div>
+		
+		<script>
+			#if ($pageTitle)
+				#set ($singleLineTitle = $Formatter.makeSingleLine($pageTitle))
+				document.title = "$productName - $Utilities.escapeForJavascript($!{singleLineTitle})";
+			#end
+		</script>
+	</body>
+</html>

@@ -1,0 +1,17 @@
+#set ($pageTitle="Error Page")
+
+#includeBootstrapCss()
+#includeJQueryJs()
+#includeBootstrapJs()
+#includeUtilitiesJs()
+
+<div class="bs-docs-example">
+  <div class="alert alert-block alert-error fade in">
+    
+    <h4 class="alert-heading">Oh snap! You got an error!</h4>
+    <p>The resource that you have requested is not accessible. Please check the URL and try again!</p>
+    <p>
+      <a class="btn btn-danger" href="${servletPageWithAction}Home">Return to Home</a>
+    </p>
+  </div>
+</div>
