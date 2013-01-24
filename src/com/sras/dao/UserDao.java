@@ -241,43 +241,6 @@ public class UserDao extends BaseDao
 		return user;
 	}
 
-	/*
-	 * @param pstmt
-	 * 
-	 * @param user
-	 * 
-	 * @throws SQLException
-	 */
-	public void prepareStatementAttribs(PreparedStatement pstmt, UserData user) throws SQLException
-	{
-		int incr = 1;
-		pstmt.setString(incr++, user.getUserName());
-		pstmt.setString(incr++, user.getFirstName());
-		prepareStatmentAttribute(pstmt, java.sql.Types.VARCHAR, user.getMiddleName(), incr++);
-		pstmt.setString(incr++, user.getLastName());
-		pstmt.setString(incr++, user.getMailId());
-		pstmt.setString(incr++, AuthenticationUtils.createPassword(user.getPassword()));
-		// todo:
-
-		if (user.getImage() != null)
-			pstmt.setObject(incr++, user.getImage());
-		else
-			pstmt.setNull(incr++, java.sql.Types.BLOB);
-
-		prepareStatmentAttribute(pstmt, java.sql.Types.VARCHAR, user.getDob(), incr++);
-		prepareStatmentAttribute(pstmt, java.sql.Types.INTEGER, String.valueOf(user.getSex()),
-				incr++);
-
-		if (user.getAddress() != null)
-			pstmt.setLong(incr++, user.getAddressId());
-		else
-			pstmt.setNull(incr++, java.sql.Types.INTEGER);
-
-		prepareStatmentAttribute(pstmt, java.sql.Types.VARCHAR, user.getMaritalStatus(), incr++);
-
-		prepareStatmentAttribute(pstmt, java.sql.Types.VARCHAR, user.getNationality(), incr++);
-	}
-
 	public static final String READ_USER = "SELECT * FROM `USER` WHERE 1=1 ";
 	public static final String DELETE_USER = "DELETE * FROM `USER` WHERE 1=1 ";
 	public static final String UPDATE_USER = "UPDATE `USER` SET `USER_NAME` = ? ,`FIRST_NAME` = ? ,`MIDDLE_NAME` = ? ,`LAST_NAME` = ? ,`EMAIL_ID` = ? ,`PASSWORD` = ? ,`IMAGE` = ? ,`DOB` = ? ,`SEX` = ? ,`ADDRESS_ID` = ? ,`MARITAL_STATUS` = ? ,`NATIONALITY` = ? WHERE `ID` = ?";

@@ -14,125 +14,106 @@ import org.apache.velocity.context.Context;
 
 import com.sras.client.utils.AuthenticationUtils;
 import com.sras.client.utils.ClientConstants;
+import com.sras.client.utils.SessionHelper;
 import com.sras.client.utils.Utilities;
 import com.sras.dao.ModelFactory;
 import com.sras.dao.UserDao;
 import com.sras.datamodel.UserData;
 
-public class LoginCommand extends Command
-{
+public class LoginCommand extends Command {
 	private static String TEMPLATE_NAME = "login.vm";
 	protected static Category log = Category.getInstance(MainCommand.class);
 
-	public LoginCommand(HttpServletRequest request, HttpServletResponse response, Context ctx)
-	{
+	public LoginCommand(HttpServletRequest request,
+			HttpServletResponse response, Context ctx) {
 		super(request, response, ctx);
 	}
 
 	@Override
-	public String execute() throws Exception
-	{
+	public String execute() throws Exception {
 
-		if (isPost)
-		{
-			try
-			{
+		if (isPost) {
+			try {
 				TEMPLATE_NAME = handleLogin();
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				log.debug(e);
 				HttpSession session = request.getSession();
 				int loginFailureCount = getLoginFailureCount(session);
-				session.setAttribute(ClientConstants.loginFailureCount, loginFailureCount + 1);
-				if (loginFailureCount > 2)
-				{
+				session.setAttribute(ClientConstants.loginFailureCount,
+						loginFailureCount + 1);
+				if (loginFailureCount > 2) {
 					ctx.put("showCaptcha", "yes");
 				}
-				ctx.put(ClientConstants.errorTextVariableName + "-signin", e.getMessage());
+				ctx.put(ClientConstants.errorTextVariableName + "-signin",
+						e.getMessage());
 				TEMPLATE_NAME = "login.vm";
 			}
-		}
-		else if (isGet)
-		{
+		} else if (isGet) {
 			HttpSession session = request.getSession();
 			int loginFailureCount = getLoginFailureCount(session);
 
-			if (loginFailureCount > 2)
-			{
+			if (loginFailureCount > 2) {
 				ctx.put("showCaptcha", "yes");
 			}
 
-			if (session.getAttribute("userName") != null)
-			{
-				try
-				{
-					redirectToURL(request, response, ClientConstants.servletPageWithDefaultAction);
-				}
-				catch (IOException e)
-				{
+			if (session.getAttribute("userName") != null) {
+				try {
+					redirectToURL(request, response,
+							ClientConstants.servletPageWithDefaultAction);
+				} catch (IOException e) {
 					log.debug(e);
 				}
-			}
-			else
-			{
+			} else {
 				TEMPLATE_NAME = "login.vm";
 			}
 		}
 		return TEMPLATE_NAME;
 	}
 
-	private int getLoginFailureCount(HttpSession session)
-	{
-		if (session == null)
-		{
+	private int getLoginFailureCount(HttpSession session) {
+		if (session == null) {
 			return 0;
 		}
 		int loginFailureCount = 0;
 		Object obj = session.getAttribute(ClientConstants.loginFailureCount);
-		if (obj != null)
-		{
+		if (obj != null) {
 			loginFailureCount = (Integer) obj;
 		}
 		return loginFailureCount;
 	}
 
-	private String handleLogin() throws Exception
-	{
+	private String handleLogin() throws Exception {
 		String userName = addToContext("lusername", false);
 		String password = request.getParameter("password");
-		String rememberUserNameString = request.getParameter("rememberUserName");
+		String rememberUserNameString = request
+				.getParameter("rememberUserName");
 		boolean rememberUserName = rememberUserNameString != null;
 
 		HttpSession session = request.getSession();
 		int loginFailureCount = getLoginFailureCount(session);
 
-		if (loginFailureCount > 3)
-		{
-			if (verifyReCaptcha())
-			{
+		if (loginFailureCount > 3) {
+			if (verifyReCaptcha()) {
 				log.debug("Answer was entered correctly!");
-			}
-			else
-			{
+			} else {
 				throw new Exception("ReCaptcha answer is incorrect!");
 			}
 		}
 
 		// This is to signin user after signup
-		userName = (String) ((userName == null) ? request.getParameter("suserName") : userName);
-		password = (String) ((password == null) ? request.getParameter("spassword") : password);
+		userName = (String) ((userName == null) ? request
+				.getParameter("suserName") : userName);
+		password = (String) ((password == null) ? request
+				.getParameter("spassword") : password);
 
 		log.debug("User " + userName + " rememberUserName " + rememberUserName);
 		UserData user = new UserData();
-		try
-		{
+		try {
 			log.debug("logging in: handleLogin");
 			// TODO: Verify User Credentials
 			user.setUserName(userName);
-			if (userName == null || userName.trim().length() == 0 || password == null
-					|| password.trim().length() == 0)
-			{
+			if (userName == null || userName.trim().length() == 0
+					|| password == null || password.trim().length() == 0) {
 				throw new LoginException("Invalid Credentials!");
 			}
 			user.setPassword(AuthenticationUtils.createPassword(password));
@@ -140,17 +121,14 @@ public class LoginCommand extends Command
 			UserDao userDao = (UserDao) ModelFactory.getImplementation(user);
 			user = (UserData) userDao.read();
 
-			if (user == null)
-			{
+			if (user == null) {
 				throw new LoginException("Invalid Credentials!");
 			}
 
-			setLoginAttributes(request.getSession(), request, user.getUserName(),
-					user.getPassword());
+			setLoginAttributes(request.getSession(), request,
+					user.getUserName(), user.getPassword());
 			log.debug("login attributes set");
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			// request.getSession().invalidate();
 			System.setProperty("loginName", "");
 			log.info("Login failed. Username=" + userName);
@@ -159,35 +137,23 @@ public class LoginCommand extends Command
 			throw e;
 		}
 
-		if (rememberUserName)
-		{
+		if (rememberUserName) {
 			String uuid = UUID.randomUUID().toString();
 			// String encryptedUuid = Encryption.encrypt(uuid);
 			Utilities.addCookie(response, ClientConstants.COOKIE_NAME, uuid,
 					ClientConstants.COOKIE_AGE);
-			ClientConstants.sessions.put(uuid, user);
+			// ClientConstants.sessions.put(uuid, user);
+			SessionHelper.createUserSession(request, uuid, user.getId(),
+					ClientConstants.COOKIE_AGE);
 			log.debug("After Login UUID ::" + uuid);
 		}
-
-		// String escapedUserName = Utilities.escapeForJavascript(userName);
-		// Cookie userNameCookie = new Cookie("userName",
-		// URLEncoder.encode(escapedUserName, "UTF-8"));
-		// if (rememberUserName)
-		// {
-		// userNameCookie.setMaxAge(1147483647); // really long time
-		// }
-		// else
-		// {
-		// userNameCookie.setMaxAge(0); // delete the cookie
-		// }
-		// response.addCookie(userNameCookie);
 
 		redirectToPrevUrl();
 		return ClientConstants.servletPage;
 	}
 
-	private void redirectToPrevUrl() throws UnsupportedEncodingException, IOException
-	{
+	private void redirectToPrevUrl() throws UnsupportedEncodingException,
+			IOException {
 		String prevURLobject = (String) request.getSession().getAttribute(
 				ClientConstants.loginRequest);
 		String prevURL = null;
@@ -199,32 +165,30 @@ public class LoginCommand extends Command
 		//
 		// but if you log out , the prev page is logOut so you are sent back
 		// || !page.equalsIgnoreCase("logout"))
-		if (prevURLobject == null || prevURLobject.indexOf("logout") != -1)
-		{
+		if (prevURLobject == null || prevURLobject.indexOf("logout") != -1) {
 			prevURL = ClientConstants.servletPage;
 			log.info("prevURL was null");
-		}
-		else
-		{
+		} else {
 			prevURL = prevURLobject;
 			log.info("prevURL " + prevURL);
 		}
 
-		if (prevURL.length() > 0)
-		{
+		if (prevURL.length() > 0) {
 			log.info("About to redirect to " + prevURL);
 			Command.redirectToURL(request, response, prevURL);
 		}
 	}
 
-	public static void setLoginAttributes(HttpSession session, HttpServletRequest request,
-			String userName, String password) throws Exception
+	public static void setLoginAttributes(HttpSession session,
+			HttpServletRequest request, String userName, String password)
+			throws Exception
 
 	{
 		session.setAttribute("userName", userName);
 		// session.setAttribute("password", password);
 
-		log.info("User " + userName + " logged in from " + Utilities.getRemoteHostName(request));
+		log.info("User " + userName + " logged in from "
+				+ Utilities.getRemoteHostName(request));
 		System.setProperty("adminDefaultLoginName", userName);
 	}
 }

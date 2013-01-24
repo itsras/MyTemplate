@@ -31,12 +31,11 @@ import com.sras.client.action.Command;
 import com.sras.client.action.LoginCommand;
 import com.sras.client.utils.ClientConstants;
 import com.sras.client.utils.Formatter;
+import com.sras.client.utils.SessionHelper;
 import com.sras.client.utils.Utilities;
 import com.sras.datamodel.UserData;
 
-@SuppressWarnings("deprecation")
-public class ControllerServlet extends VelocityServlet
-{
+public class ControllerServlet extends VelocityServlet {
 	private static Category log = Category.getInstance(ControllerServlet.class);
 	private static Integer SESSION_TIMEOUT = null;
 	private static final long serialVersionUID = 1L;
@@ -49,24 +48,22 @@ public class ControllerServlet extends VelocityServlet
 	 * 
 	 * @return deploy directory name
 	 */
-	public String getDeployDirectory()
-	{
+	public String getDeployDirectory() {
 		ServletContext servletContext = getServletContext();
 		String realPath = servletContext.getRealPath("./");
 		return realPath;
 	}
 
-	private void loadActionMappings(ServletConfig config) throws FileNotFoundException, IOException
-	{
-		if (actionMappings.size() == 0)
-		{
-			String actionMappingsFile = config.getInitParameter("action.mappings");
-			if (actionMappingsFile != null)
-			{
-				String realPath = getServletContext().getRealPath(actionMappingsFile);
+	private void loadActionMappings(ServletConfig config)
+			throws FileNotFoundException, IOException {
+		if (actionMappings.size() == 0) {
+			String actionMappingsFile = config
+					.getInitParameter("action.mappings");
+			if (actionMappingsFile != null) {
+				String realPath = getServletContext().getRealPath(
+						actionMappingsFile);
 
-				if (realPath != null)
-				{
+				if (realPath != null) {
 					actionMappingsFile = realPath;
 				}
 			}
@@ -76,9 +73,8 @@ public class ControllerServlet extends VelocityServlet
 	}
 
 	@Override
-	protected Properties loadConfiguration(ServletConfig config) throws IOException,
-			FileNotFoundException
-	{
+	protected Properties loadConfiguration(ServletConfig config)
+			throws IOException, FileNotFoundException {
 		loadActionMappings(config);
 
 		String propsFile = config.getInitParameter(INIT_PROPS_KEY);
@@ -86,12 +82,10 @@ public class ControllerServlet extends VelocityServlet
 		 * now convert to an absolute path relative to the webapp root This will
 		 * work in a decently implemented servlet 2.2 container like Tomcat.
 		 */
-		if (propsFile != null)
-		{
+		if (propsFile != null) {
 			String realPath = getServletContext().getRealPath(propsFile);
 
-			if (realPath != null)
-			{
+			if (realPath != null) {
 				propsFile = realPath;
 			}
 		}
@@ -106,13 +100,11 @@ public class ControllerServlet extends VelocityServlet
 		 */
 
 		String path = properties.getProperty("file.resource.loader.path");
-		if (path != null)
-		{
+		if (path != null) {
 			String isRelativeToDeployDirectory = properties
 					.getProperty("file.resource.loader.isRelativeToDeployDirectory");
 			if (isRelativeToDeployDirectory == null
-					|| !isRelativeToDeployDirectory.equalsIgnoreCase("false"))
-			{
+					|| !isRelativeToDeployDirectory.equalsIgnoreCase("false")) {
 				path = getServletContext().getRealPath(path);
 			}
 			log.info("Setting file.resource.loader.path to: " + path);
@@ -124,62 +116,48 @@ public class ControllerServlet extends VelocityServlet
 
 	@Override
 	protected void mergeTemplate(Template template, Context context,
-			HttpServletResponse httpServletResponse) throws ResourceNotFoundException,
-			ParseErrorException, MethodInvocationException, IOException,
-			UnsupportedEncodingException, Exception
-	{
-		try
-		{
+			HttpServletResponse httpServletResponse)
+			throws ResourceNotFoundException, ParseErrorException,
+			MethodInvocationException, IOException,
+			UnsupportedEncodingException, Exception {
+		try {
 			super.mergeTemplate(template, context, httpServletResponse);
-		}
-		catch (SocketException e)
-		{
-			log.error("Socket exception in mergeTemplate: " + e.getMessage() + "\nTemplate = "
-					+ template.getName());
+		} catch (SocketException e) {
+			log.error("Socket exception in mergeTemplate: " + e.getMessage()
+					+ "\nTemplate = " + template.getName());
 			return;
-		}
-		catch (EOFException e)
-		{
-			log.error("EOFException in mergeTemplate: " + e.getMessage() + "\nTemplate = "
-					+ template.getName());
+		} catch (EOFException e) {
+			log.error("EOFException in mergeTemplate: " + e.getMessage()
+					+ "\nTemplate = " + template.getName());
 			return;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			final String exceptionClassName = e.getClass().getName();
-			if (exceptionClassName.indexOf("ClientAbortException") >= 0)
-			{
-				log.error("ClientAbortException exception in mergeTemplate: " + e + "\nTemplate = "
-						+ template.getName());
+			if (exceptionClassName.indexOf("ClientAbortException") >= 0) {
+				log.error("ClientAbortException exception in mergeTemplate: "
+						+ e + "\nTemplate = " + template.getName());
 				return;
 			}
-			log.error("Exception in mergeTemplate: " + e + "\nTemplate = " + template.getName(), e);
+			log.error("Exception in mergeTemplate: " + e + "\nTemplate = "
+					+ template.getName(), e);
 			throw e;
 		}
 	}
 
 	@Override
-	protected void requestCleanup(HttpServletRequest request, HttpServletResponse response,
-			Context context)
-	{
+	protected void requestCleanup(HttpServletRequest request,
+			HttpServletResponse response, Context context) {
 		super.requestCleanup(request, response, context);
-		try
-		{
+		try {
 			response.flushBuffer();
-		}
-		catch (SocketException e)
-		{
+		} catch (SocketException e) {
 			assert e == e;
 			// Tomcat - ignore this exception
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			boolean dontLog = false;
 			// Tomcat - ignore certain exceptions
 			String exceptionClassName = e.getClass().getName();
 			if (exceptionClassName.indexOf("ClientAbortException") >= 0
-					|| exceptionClassName.indexOf("SocketException") >= 0)
-			{
+					|| exceptionClassName.indexOf("SocketException") >= 0) {
 				dontLog = true;
 			}
 			if (!dontLog)
@@ -189,9 +167,8 @@ public class ControllerServlet extends VelocityServlet
 	}
 
 	@Override
-	protected Template handleRequest(HttpServletRequest request, HttpServletResponse response,
-			Context ctx) throws Exception
-	{
+	protected Template handleRequest(HttpServletRequest request,
+			HttpServletResponse response, Context ctx) throws Exception {
 		Template template = null;
 		Integer sessionTimeout = null;
 		final HttpSession session = request.getSession();
@@ -199,31 +176,27 @@ public class ControllerServlet extends VelocityServlet
 
 		String contextPath = request.getContextPath();
 		String requestURI = request.getRequestURI();
-		String path = requestURI.substring(requestURI.indexOf(contextPath) + contextPath.length()
-				+ 1);
+		String path = requestURI.substring(requestURI.indexOf(contextPath)
+				+ contextPath.length() + 1);
 
 		String page = request.getParameter(ClientConstants.pageVerb);
 		if (path != null && path.trim().length() > 0
-				&& !path.equalsIgnoreCase(ClientConstants.servletPage))
-		{
+				&& !path.equalsIgnoreCase(ClientConstants.servletPage)) {
 			page = path;
 		}
-		try
-		{
-			//Handle logout
-			if (handleLogout(request, response, page, session))
-			{
+		try {
+			// Handle logout
+			if (handleLogout(request, response, page, session)) {
 				return null;
 			}
-			
-			//Handle cookie based sign in
+
+			// Handle cookie based sign in
 			validateSession(request, response, ctx, page);
 
 			// this dynamically sets the SESSION_TIMEOUT to the default Max
 			// timeout
 			// interval in server.xml
-			if (session != null && SESSION_TIMEOUT == null)
-			{
+			if (session != null && SESSION_TIMEOUT == null) {
 				SESSION_TIMEOUT = session.getMaxInactiveInterval();
 				sessionTimeout = new Integer(session.getMaxInactiveInterval());
 				// don't allow timeouts while processing a request
@@ -233,18 +206,14 @@ public class ControllerServlet extends VelocityServlet
 
 			// Handle request now...
 			Boolean errorOccurred = new Boolean(false);
-			template = processRequest(request, response, ctx, page, errorOccurred);
-		}
-		catch (Exception e)
-		{
+			template = processRequest(request, response, ctx, page,
+					errorOccurred);
+		} catch (Exception e) {
 			log.debug(e.getMessage(), e);
 			ctx.put(ClientConstants.errorTextVariableName, e.getMessage());
 			System.err.println("Exception caught: " + e.getMessage());
-		}
-		finally
-		{
-			if (sessionTimeout != null)
-			{
+		} finally {
+			if (sessionTimeout != null) {
 				Utilities.markSessionAsAccessed(session);
 
 				// reset timeout to previous value
@@ -259,41 +228,39 @@ public class ControllerServlet extends VelocityServlet
 		return template;
 	}
 
-	private void validateSession(HttpServletRequest request, HttpServletResponse response,
-			Context ctx, String page) throws Exception, IOException, ServletException
-	{
+	private void validateSession(HttpServletRequest request,
+			HttpServletResponse response, Context ctx, String page)
+			throws Exception, IOException, ServletException {
 		HttpSession session = request.getSession();
 		boolean noLoginRequired = pageDoesNotRequireLogin(page);
-		String userName = (session == null) ? null : (String) session.getAttribute("userName");
+		String userName = (session == null) ? null : (String) session
+				.getAttribute("userName");
 
-		String uuid = Utilities.getCookieValue(request, ClientConstants.COOKIE_NAME);
-		if (userName == null && uuid != null)
-		{
+		String uuid = Utilities.getCookieValue(request,
+				ClientConstants.COOKIE_NAME);
+		if (userName == null && uuid != null) {
 			log.debug("Before Login UUID ::" + uuid);
-			UserData user = (UserData) ClientConstants.sessions.get(uuid);
-			if (user != null)
-			{
-				LoginCommand.setLoginAttributes(session, request, user.getUserName(),
-						user.getPassword());
-				page = (page == null || page.equalsIgnoreCase("login")) ? "home" : page;
-			}
-			else
-			{
+			// UserData user = (UserData) ClientConstants.sessions.get(uuid);
+			UserData user = SessionHelper.getUserFromSession(uuid);
+			if (user != null) {
+				LoginCommand.setLoginAttributes(session, request,
+						user.getUserName(), user.getPassword());
+				page = (page == null || page.equalsIgnoreCase("login")) ? "home"
+						: page;
+				SessionHelper.updateUserSession(request, uuid, user.getId(), 0);
+			} else {
 				Utilities.removeCookie(response, ClientConstants.COOKIE_NAME);
 				Command.redirectToLoginPage(request, response, ctx);
 			}
-		}
-		else if (userName == null && !noLoginRequired)
-		{
+		} else if (userName == null && !noLoginRequired) {
 			Command.redirectToLoginPage(request, response, ctx);
 		}
 	}
 
-	@SuppressWarnings(
-	{ "unchecked" })
-	private Template processRequest(HttpServletRequest request, HttpServletResponse response,
-			Context ctx, String page, Boolean errorOccurred) throws Exception
-	{
+	@SuppressWarnings({ "unchecked" })
+	private Template processRequest(HttpServletRequest request,
+			HttpServletResponse response, Context ctx, String page,
+			Boolean errorOccurred) throws Exception {
 		final HttpSession session = request.getSession();
 
 		// Log the request
@@ -305,30 +272,28 @@ public class ControllerServlet extends VelocityServlet
 		String template = null;
 		Command command = null;
 
-		boolean dontShowInFramework = Boolean.parseBoolean(request.getParameter("dsif"))
+		boolean dontShowInFramework = Boolean.parseBoolean(request
+				.getParameter("dsif"))
 				|| Boolean.parseBoolean(request.getParameter("ajax"));
 
 		String value = actionMappings.getProperty(page.toLowerCase());
 
-		Object obj = (value != null && !value.contains(".vm")) ? Class.forName(value) : value;
+		Object obj = (value != null && !value.contains(".vm")) ? Class
+				.forName(value) : value;
 		// Object obj = commandMap.get(page.toLowerCase());
 		Class<Command> cl = null;
 
-		if (obj != null)
-		{
-			if (obj instanceof Class)
-			{
+		if (obj != null) {
+			if (obj instanceof Class) {
 				cl = (Class<Command>) obj;
-				if (cl != null)
-				{
-					Constructor<Command> c = cl.getDeclaredConstructor(HttpServletRequest.class,
+				if (cl != null) {
+					Constructor<Command> c = cl.getDeclaredConstructor(
+							HttpServletRequest.class,
 							HttpServletResponse.class, Context.class);
 					command = c.newInstance(request, response, ctx);
 					template = command.execute();
 				}
-			}
-			else if (obj instanceof String)
-			{
+			} else if (obj instanceof String) {
 				template = (String) obj;
 			}
 		}
@@ -336,33 +301,36 @@ public class ControllerServlet extends VelocityServlet
 		template = Utilities.escapeXSS(template);
 
 		ctx.put(ClientConstants.pageVerb, template);
-		if (!dontShowInFramework)
-		{
+		if (!dontShowInFramework) {
 			ctx.put("body", template);
 		}
-		return dontShowInFramework ? getTemplate(template) : getTemplate(FRAMEWORK_TEMPLATE);
+		return dontShowInFramework ? getTemplate(template)
+				: getTemplate(FRAMEWORK_TEMPLATE);
 	}
 
-	public boolean handleLogout(HttpServletRequest request, HttpServletResponse response,
-			String page, final HttpSession session) throws IOException
-	{
-		if (page != null && page.equalsIgnoreCase("logout"))
-		{
-			synchronized (session)
-			{
+	public boolean handleLogout(HttpServletRequest request,
+			HttpServletResponse response, String page, final HttpSession session)
+			throws IOException {
+		if (page != null && page.equalsIgnoreCase("logout")) {
+			synchronized (session) {
 				session.setAttribute("userName", null);
 				session.setAttribute("password", null);
 				session.setAttribute("User", null);
 				session.invalidate();
-				String uuid = Utilities.getCookieValue(request, ClientConstants.COOKIE_NAME);
-				if(uuid != null)
-				{
-					ClientConstants.sessions.remove(uuid);
+				String uuid = Utilities.getCookieValue(request,
+						ClientConstants.COOKIE_NAME);
+				if (uuid != null) {
+					//ClientConstants.sessions.remove(uuid);
+					try {
+						SessionHelper.deleteUserSession(uuid);
+					} catch (Exception e) {
+						log.error("Failed to delete the session", e);
+					}
 				}
 				Utilities.removeCookie(response, ClientConstants.COOKIE_NAME);
 			}
-			Command.redirectToURL(request, response, ClientConstants.servletPageWithAction
-					+ "login");
+			Command.redirectToURL(request, response,
+					ClientConstants.servletPageWithAction + "login");
 			return true;
 		}
 		return false;
@@ -379,10 +347,10 @@ public class ControllerServlet extends VelocityServlet
 	// }
 
 	private void setDefaultContextVariables(HttpServletRequest request,
-			HttpServletResponse response, Context ctx)
-	{
-		String path = new File(Thread.currentThread().getContextClassLoader().getResource("")
-				.getFile()).getParentFile().getParentFile().getPath();
+			HttpServletResponse response, Context ctx) {
+		String path = new File(Thread.currentThread().getContextClassLoader()
+				.getResource("").getFile()).getParentFile().getParentFile()
+				.getPath();
 		ctx.put("path", path);
 
 		ctx.put("Formatter", new Formatter());
@@ -393,17 +361,16 @@ public class ControllerServlet extends VelocityServlet
 		ctx.put("servletPage", ClientConstants.servletPage);
 		ctx.put("actionVerb", ClientConstants.pageVerb);
 		ctx.put("servletPageWithAction", ClientConstants.servletPageWithAction);
-		ctx.put("servletPageWithAjaxAction", ClientConstants.servletPageWithAjaxAction);
+		ctx.put("servletPageWithAjaxAction",
+				ClientConstants.servletPageWithAjaxAction);
 
 		HttpSession session = request.getSession();
 		Object userName = session.getAttribute("userName");
-		if (userName != null)
-		{
+		if (userName != null) {
 			ctx.put("userName", (String) userName);
 		}
 		Object user = session.getAttribute("User");
-		if (user != null)
-		{
+		if (user != null) {
 			ctx.put("user", (String) user);
 		}
 		String requestedURL = Utilities.getRequestedURL(request);
@@ -414,16 +381,16 @@ public class ControllerServlet extends VelocityServlet
 		ctx.put("contextPath", contextPath);
 	}
 
-	private boolean pageDoesNotRequireLogin(String page)
-	{
+	private boolean pageDoesNotRequireLogin(String page) {
 		return page != null
-				&& (page.equalsIgnoreCase("copyright") || page.equalsIgnoreCase("login")
-						|| page.equalsIgnoreCase("logout") || page.equalsIgnoreCase("signup"));
+				&& (page.equalsIgnoreCase("copyright")
+						|| page.equalsIgnoreCase("login")
+						|| page.equalsIgnoreCase("logout") || page
+							.equalsIgnoreCase("signup"));
 	}
 
 	@Override
-	public void init() throws ServletException
-	{
+	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
 		String prefix = getServletContext().getRealPath("/");
@@ -431,65 +398,57 @@ public class ControllerServlet extends VelocityServlet
 
 		// if the log4j-init-file context parameter is not set, then no point in
 		// trying
-		if (file != null)
-		{
+		if (file != null) {
 			PropertyConfigurator.configure(prefix + file);
 			System.out.println("Log4J Logging started: " + prefix + file);
-		}
-		else
-		{
-			System.out.println("Log4J Is not configured for your Application: " + prefix + file);
+		} else {
+			System.out.println("Log4J Is not configured for your Application: "
+					+ prefix + file);
 		}
 	}
 
-	private void logTheRequest(HttpServletRequest request, HttpSession session)
-	{ // log the request
-		if (log.getEffectiveLevel().isGreaterOrEqual(Level.DEBUG))
-		{
+	private void logTheRequest(HttpServletRequest request, HttpSession session) { // log
+																					// the
+																					// request
+		if (log.getEffectiveLevel().isGreaterOrEqual(Level.DEBUG)) {
 			String requestedURL = Utilities.getRequestedURL(request);
 			String method = request.getMethod();
 			Object user = request.getSession().getAttribute("User");
-			StringBuffer logMessage = new StringBuffer("ControllerServlet.processRequest. URL = "
-					+ requestedURL);
-			if (user != null)
-			{
+			StringBuffer logMessage = new StringBuffer(
+					"ControllerServlet.processRequest. URL = " + requestedURL);
+			if (user != null) {
 				logMessage.append(" user = " + user + "/");
-			}
-			else
-			{
+			} else {
 				logMessage.append(" from  ");
 			}
 			String remoteHost = Utilities.getRemoteHostName(request);
 			logMessage.append(remoteHost);
-			String sessionId = (session != null) ? session.getId() : "EMPTY_SESSION_ID";
-			if (user != null)
-			{
+			String sessionId = (session != null) ? session.getId()
+					: "EMPTY_SESSION_ID";
+			if (user != null) {
 				logMessage.append("/");
-			}
-			else
-			{
+			} else {
 				logMessage.append(" session = ");
 			}
 			logMessage.append(sessionId);
 
-			if (!method.equalsIgnoreCase("get"))
-			{
+			if (!method.equalsIgnoreCase("get")) {
 				logMessage.append(" method = " + method);
 			}
 			log.info(logMessage);
 		}
 	}
 
-	private void handleException(Boolean errorOccurred, Exception e, Context context)
-	{
+	private void handleException(Boolean errorOccurred, Exception e,
+			Context context) {
 		errorOccurred = true;
 		log.error(e.getMessage(), e);
 		context.put(ClientConstants.errorTextVariableName, e);
 	}
 
 	@SuppressWarnings("unused")
-	private void handleException(Boolean errorOccurred, String errorMessage, Context context)
-	{
+	private void handleException(Boolean errorOccurred, String errorMessage,
+			Context context) {
 		errorOccurred = true;
 		context.put(ClientConstants.errorTextVariableName, errorMessage);
 		log.error(errorMessage);

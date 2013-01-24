@@ -25,7 +25,6 @@ public class SignupCommand extends Command
 	@Override
 	public String execute() throws Exception
 	{
-
 		if (isPost)
 		{
 			try
@@ -58,7 +57,6 @@ public class SignupCommand extends Command
 	private long handleSignup(HttpServletRequest request, HttpServletResponse response, Context ctx)
 			throws Exception
 	{
-
 		try
 		{
 			String firstName = addToContext("firstName", true);

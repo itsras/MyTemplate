@@ -8,6 +8,7 @@ import java.util.Map;
 import com.sras.datamodel.AddressData;
 import com.sras.datamodel.DataModel;
 import com.sras.datamodel.UserData;
+import com.sras.datamodel.UserSessionData;
 
 public class ModelFactory
 {
@@ -22,6 +23,7 @@ public class ModelFactory
 			modelToDao = new HashMap<Class, Class>();
 			modelToDao.put(UserData.class, UserDao.class);
 			modelToDao.put(AddressData.class, AddressDao.class);
+			modelToDao.put(UserSessionData.class, UserSessionDao.class);
 		}
 	}
 
