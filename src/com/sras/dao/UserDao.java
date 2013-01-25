@@ -1,7 +1,6 @@
 package com.sras.dao;
 
 import java.sql.Blob;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -9,17 +8,14 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 
-import com.sras.client.utils.AuthenticationUtils;
 import com.sras.datamodel.DataModel;
 import com.sras.datamodel.UserData;
 import com.sras.datamodel.exceptions.DataModelException;
 import com.sras.datamodel.exceptions.FixedValueException;
 import com.sras.datamodel.exceptions.TMException;
 
-public class UserDao extends BaseDao
-{
-	public UserDao(DataModel datamodel)
-	{
+public class UserDao extends BaseDao {
+	public UserDao(DataModel datamodel) {
 		super(datamodel);
 		// TODO Auto-generated constructor stub
 	}
@@ -27,11 +23,11 @@ public class UserDao extends BaseDao
 	private static Logger logger = Logger.getLogger(UserDao.class.getName());
 
 	@Override
-	public long create() throws DataModelException, TMException, SQLException
-	{
+	public long create() throws DataModelException, TMException, SQLException {
 		UserData user = (UserData) datamodel;
 		if (user == null)
-			throw new TMException("INVALID_VO", "provided User instance is null");
+			throw new TMException("INVALID_VO",
+					"provided User instance is null");
 
 		if (isEmptyOrNull(user.getUserName()))
 			throw new TMException("INVALID_KEY", "required key not found");
@@ -40,8 +36,7 @@ public class UserDao extends BaseDao
 			throw new SQLException("USER_EXISTS", "User Name already in use");
 
 		ResultSet rst = null;
-		try
-		{
+		try {
 			String sql = CREATE_USER;
 			Collection<SQLValue> bindVars = new ArrayList<SQLValue>();
 
@@ -60,26 +55,20 @@ public class UserDao extends BaseDao
 
 			logger.debug("QUERY - Loading Address :" + sql);
 			return executeUpdate(sql, bindVars);
-		}
-		catch (SQLException sql)
-		{
+		} catch (SQLException sql) {
 			logger.error("SQL-Exception", sql);
 			throw new TMException("SQL-Exception", sql.getLocalizedMessage());
-		}
-		finally
-		{
+		} finally {
 			close(null, rst);
 		}
 	}
 
 	@Override
-	public long update() throws DataModelException, TMException, SQLException
-	{
+	public long update() throws DataModelException, TMException, SQLException {
 		UserData user = (UserData) datamodel;
 
 		ResultSet rst = null;
-		try
-		{
+		try {
 			String sql = UPDATE_USER;
 			Collection<SQLValue> bindVars = new ArrayList<SQLValue>();
 
@@ -99,81 +88,65 @@ public class UserDao extends BaseDao
 
 			logger.debug("QUERY - Loading Address :" + sql);
 			return executeUpdate(sql, bindVars);
-		}
-		catch (SQLException sql)
-		{
+		} catch (SQLException sql) {
 			logger.error("SQL-Exception", sql);
 			throw new TMException("SQL-Exception", sql.getLocalizedMessage());
-		}
-		finally
-		{
+		} finally {
 			close(null, rst);
 		}
 	}
 
 	@Override
-	public ArrayList<DataModel> enumerate() throws DataModelException, TMException, SQLException
-	{
+	public ArrayList<DataModel> enumerate() throws DataModelException,
+			TMException, SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public int delete() throws DataModelException, TMException, SQLException
-	{
+	public int delete() throws DataModelException, TMException, SQLException {
 		UserData user = (UserData) datamodel;
 
 		ResultSet rst = null;
-		try
-		{
+		try {
 			String sql = DELETE_USER;
 			Collection<SQLValue> bindVars = new ArrayList<SQLValue>();
-			if (user.getId() > 0)
-			{
-				sql += "`ID` = ? ";
+			if (user.getId() > 0) {
+				sql += AND + "`ID` = ? ";
 				bindVars.add(SQLValue.Long(user.getId()));
 			}
-			if (user.getUserName() != null)
-			{
+			if (user.getUserName() != null) {
 				sql += AND + "`USER_NAME` = ? ";
 				bindVars.add(SQLValue.String(user.getUserName()));
 			}
 			logger.debug("QUERY - Loading Address :" + sql);
 			return executeUpdate(sql, bindVars);
-		}
-		catch (SQLException sql)
-		{
+		} catch (SQLException sql) {
 			logger.error("SQL-Exception", sql);
 			throw new TMException("SQL-Exception", sql.getLocalizedMessage());
-		}
-		finally
-		{
+		} finally {
 			close(null, rst);
 		}
 	}
 
 	@Override
-	public DataModel read() throws DataModelException, TMException, SQLException
-	{
+	public DataModel read() throws DataModelException, TMException,
+			SQLException {
 		UserData user = (UserData) datamodel;
 
 		ResultSet rst = null;
-		try
-		{
+		try {
 			String sql = READ_USER;
 			Collection<SQLValue> bindVars = new ArrayList<SQLValue>();
-			if (user.getId() > 0)
-			{
-				sql += "`ID` = ? ";
+			if (user.getId() > 0) {
+				sql += AND + "`ID` = ? ";
 				bindVars.add(SQLValue.Long(user.getId()));
 			}
-			if (user.getUserName() != null)
-			{
+			if (user.getUserName() != null) {
 				sql += AND + "`USER_NAME` = ? ";
 				bindVars.add(SQLValue.String(user.getUserName()));
 			}
-			if (user.getPassword() != null)
-			{
+			if (user.getPassword() != null) {
 				sql += AND + "`PASSWORD` = ? ";
 				bindVars.add(SQLValue.String(user.getPassword()));
 			}
@@ -181,21 +154,16 @@ public class UserDao extends BaseDao
 			rst = executeQuery(sql, bindVars);
 
 			return loadUserVO(user, rst);
-		}
-		catch (SQLException sql)
-		{
+		} catch (SQLException sql) {
 			logger.error("SQL-Exception", sql);
 			throw new TMException("SQL-Exception", sql.getLocalizedMessage());
-		}
-		finally
-		{
+		} finally {
 			close(null, rst);
 		}
 	}
 
 	@Override
-	public boolean validateRules() throws TMException
-	{
+	public boolean validateRules() throws TMException {
 		// TODO Auto-generated method stub
 		return true;
 	}
@@ -206,23 +174,18 @@ public class UserDao extends BaseDao
 	 * @param rst
 	 * @throws SQLException
 	 */
-	public DataModel loadUserVO(UserData user, ResultSet rst) throws TMException, SQLException
-	{
-		if (!rst.next())
-		{
+	public DataModel loadUserVO(UserData user, ResultSet rst)
+			throws TMException, SQLException {
+		if (!rst.next()) {
 			return null;
 		}
 
-		if (user == null)
-		{
+		if (user == null) {
 			user = new UserData();
 		}
-		try
-		{
+		try {
 			user.setId(rst.getLong(ID));
-		}
-		catch (FixedValueException e)
-		{
+		} catch (FixedValueException e) {
 			// TODO Auto-generated catch block
 			logger.error(e.getMessage(), e);
 		}

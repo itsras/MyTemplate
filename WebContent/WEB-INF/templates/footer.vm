@@ -1,0 +1,18 @@
+<style>
+	#Footer {
+		padding: 30px 0 44px;
+	}
+</style>
+
+<footer id="Footer">
+	<div style="border-top: 1px solid #CCCCCC;">
+		<center>
+			<span><font color="black">&copy; 2012 ${productName}. All Rights Reserved</span></font><br>
+			<a href="#">Privacy Policy</a> |
+			<a href="#">Cookie Policy</a> |
+			<a href="#">Terms of Service</a> |
+			<a href="#">Site Map</a> |
+			<a href="#">Site Credits</a>
+		</center>
+	</div>
+</footer>

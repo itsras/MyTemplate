@@ -236,11 +236,13 @@ public class ControllerServlet extends VelocityServlet {
 		String userName = (session == null) ? null : (String) session
 				.getAttribute("userName");
 
+		if (userName != null) {
+			return;
+		}
 		String uuid = Utilities.getCookieValue(request,
 				ClientConstants.COOKIE_NAME);
 		if (userName == null && uuid != null) {
 			log.debug("Before Login UUID ::" + uuid);
-			// UserData user = (UserData) ClientConstants.sessions.get(uuid);
 			UserData user = SessionHelper.getUserFromSession(uuid);
 			if (user != null) {
 				LoginCommand.setLoginAttributes(session, request,
@@ -300,6 +302,8 @@ public class ControllerServlet extends VelocityServlet {
 		template = (template == null) ? ERROR_TEMPLATE : template;
 		template = Utilities.escapeXSS(template);
 
+		showHeader(ctx, template);
+
 		ctx.put(ClientConstants.pageVerb, template);
 		if (!dontShowInFramework) {
 			ctx.put("body", template);
@@ -320,7 +324,6 @@ public class ControllerServlet extends VelocityServlet {
 				String uuid = Utilities.getCookieValue(request,
 						ClientConstants.COOKIE_NAME);
 				if (uuid != null) {
-					//ClientConstants.sessions.remove(uuid);
 					try {
 						SessionHelper.deleteUserSession(uuid);
 					} catch (Exception e) {
@@ -364,6 +367,7 @@ public class ControllerServlet extends VelocityServlet {
 		ctx.put("servletPageWithAjaxAction",
 				ClientConstants.servletPageWithAjaxAction);
 
+		ctx.put("captchaPublicKey", ClientConstants.RECAPTCHA_PUBLIC_KEY);
 		HttpSession session = request.getSession();
 		Object userName = session.getAttribute("userName");
 		if (userName != null) {
@@ -379,6 +383,11 @@ public class ControllerServlet extends VelocityServlet {
 
 		String contextPath = request.getContextPath();
 		ctx.put("contextPath", contextPath);
+	}
+
+	private void showHeader(Context ctx, String template) {
+		boolean hideHeader = template.equalsIgnoreCase("login.vm");
+		ctx.put("showHeader", !hideHeader);
 	}
 
 	private boolean pageDoesNotRequireLogin(String page) {
@@ -439,6 +448,7 @@ public class ControllerServlet extends VelocityServlet {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void handleException(Boolean errorOccurred, Exception e,
 			Context context) {
 		errorOccurred = true;

@@ -14,13 +14,13 @@
 	</head>
 	<body>
 		<div class="container">
-			#if($page != "login.vm")
-				#showHeader()
+			#if($showHeader)
+				#parse("header.vm")
 			#else
 				<br>
 			#end
 			#parse($body)
-			#showFooter()
+			#parse("footer.vm")
 		</div>
 		
 		<script>
