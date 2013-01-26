@@ -8,40 +8,27 @@ import org.apache.velocity.context.Context;
 
 import com.sras.client.utils.Utilities;
 
-public class MainCommand extends Command
-{
+public class MainCommand extends Command {
 	private static String TEMPLATE_NAME = "index.vm";
 	protected static Category log = Category.getInstance(MainCommand.class);
-	
-	public MainCommand(HttpServletRequest request, HttpServletResponse response, Context ctx)
-	{
+
+	public MainCommand(HttpServletRequest request,
+			HttpServletResponse response, Context ctx) {
 		super(request, response, ctx);
 	}
 
-	@Override
-	public String execute()
-	{
+	public String doAjaxGet() {
+		ctx.put("ajax_response_data", "Ajax call successful!");
+		return "ajax_template.vm";
+	}
 
-		if (isPost)
-		{
-			if (isAjax)
-			{
-				return "ajax_template.vm";
-			}
-
-		}
-		else if (isGet)
-		{
-			if (isAjax)
-			{
-				ctx.put("ajax_response_data", "Ajax call successful!");
-				return "ajax_template.vm";
-			}
-			String hostName = Utilities.getRemoteHostName(request);
-			ctx.put("hostName", hostName);
-		}
-		// TODO Auto-generated method stub
+	public String doGet() throws Exception {
+		String hostName = Utilities.getRemoteHostName(request);
+		ctx.put("hostName", hostName);
 		return TEMPLATE_NAME;
 	}
 
+	public String doAjaxPost() throws Exception {
+		return "ajax_template.vm";
+	}
 }

@@ -21,50 +21,48 @@ import com.sras.dao.UserDao;
 import com.sras.datamodel.UserData;
 
 public class LoginCommand extends Command {
-	private static String TEMPLATE_NAME = "login.vm";
-	protected static Category log = Category.getInstance(MainCommand.class);
+	protected static Category log = Category.getInstance(LoginCommand.class);
 
 	public LoginCommand(HttpServletRequest request,
 			HttpServletResponse response, Context ctx) {
 		super(request, response, ctx);
 	}
 
-	@Override
-	public String execute() throws Exception {
-
-		if (isPost) {
-			try {
-				TEMPLATE_NAME = handleLogin();
-			} catch (Exception e) {
-				log.debug(e);
-				HttpSession session = request.getSession();
-				int loginFailureCount = getLoginFailureCount(session);
-				session.setAttribute(ClientConstants.loginFailureCount,
-						loginFailureCount + 1);
-				if (loginFailureCount > 2) {
-					ctx.put("showCaptcha", "yes");
-				}
-				ctx.put(ClientConstants.errorTextVariableName + "-signin",
-						e.getMessage());
-				TEMPLATE_NAME = "login.vm";
-			}
-		} else if (isGet) {
+	public String doPost() throws Exception {
+		TEMPLATE_NAME = "login.vm";
+		try {
+			TEMPLATE_NAME = handleLogin();
+		} catch (Exception e) {
+			log.debug(e);
 			HttpSession session = request.getSession();
 			int loginFailureCount = getLoginFailureCount(session);
-
+			session.setAttribute(ClientConstants.loginFailureCount,
+					loginFailureCount + 1);
 			if (loginFailureCount > 2) {
 				ctx.put("showCaptcha", "yes");
 			}
+			ctx.put(ClientConstants.errorTextVariableName + "-signin",
+					e.getMessage());
+			TEMPLATE_NAME = "login.vm";
+		}
+		return TEMPLATE_NAME;
+	}
 
-			if (session.getAttribute("userName") != null) {
-				try {
-					redirectToURL(request, response,
-							ClientConstants.servletPageWithDefaultAction);
-				} catch (IOException e) {
-					log.debug(e);
-				}
-			} else {
-				TEMPLATE_NAME = "login.vm";
+	public String doGet() throws Exception {
+		TEMPLATE_NAME = "login.vm";
+		HttpSession session = request.getSession();
+		int loginFailureCount = getLoginFailureCount(session);
+
+		if (loginFailureCount > 2) {
+			ctx.put("showCaptcha", "yes");
+		}
+
+		if (session.getAttribute("userName") != null) {
+			try {
+				redirectToURL(request, response,
+						ClientConstants.servletPageWithDefaultAction);
+			} catch (IOException e) {
+				log.debug(e);
 			}
 		}
 		return TEMPLATE_NAME;

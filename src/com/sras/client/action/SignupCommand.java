@@ -12,53 +12,32 @@ import com.sras.dao.ModelFactory;
 import com.sras.dao.UserDao;
 import com.sras.datamodel.UserData;
 
-public class SignupCommand extends Command
-{
+public class SignupCommand extends Command {
 	private static String TEMPLATE_NAME = "login.vm";
-	protected static Category log = Category.getInstance(MainCommand.class);
+	protected static Category log = Category.getInstance(SignupCommand.class);
 
-	public SignupCommand(HttpServletRequest request, HttpServletResponse response, Context ctx)
-	{
+	public SignupCommand(HttpServletRequest request,
+			HttpServletResponse response, Context ctx) {
 		super(request, response, ctx);
 	}
 
-	@Override
-	public String execute() throws Exception
-	{
-		if (isPost)
-		{
-			try
-			{
-				handleSignup(request, response, ctx);
-				LoginCommand lc = new LoginCommand(request, response, ctx);
-				TEMPLATE_NAME = lc.execute();
-				if (isAjax)
-				{
-					ctx.put(ClientConstants.ajaxResponseData, "yes");
-					TEMPLATE_NAME = ClientConstants.ajaxTemplate;
-				}
-				// redirectToLoginPage(request, response, ctx);
-			}
-			catch (Exception e)
-			{
-				log.debug(e);
-				ctx.put(ClientConstants.errorTextVariableName + "-signup",
-						"Please provide valid details to signup");
-				TEMPLATE_NAME = "login.vm";
-			}
-		}
-		else if (isGet)
-		{
-			// Nothing here....
+	public String doPost() throws Exception {
+		try {
+			handleSignup(request, response, ctx);
+			LoginCommand lc = new LoginCommand(request, response, ctx);
+			TEMPLATE_NAME = lc.execute();
+		} catch (Exception e) {
+			log.debug(e);
+			ctx.put(ClientConstants.errorTextVariableName + "-signup",
+					"Please provide valid details to signup");
+			TEMPLATE_NAME = "login.vm";
 		}
 		return TEMPLATE_NAME;
 	}
 
-	private long handleSignup(HttpServletRequest request, HttpServletResponse response, Context ctx)
-			throws Exception
-	{
-		try
-		{
+	private long handleSignup(HttpServletRequest request,
+			HttpServletResponse response, Context ctx) throws Exception {
+		try {
 			String firstName = addToContext("firstName", true);
 			String lastName = addToContext("lastName", true);
 			String suserName = addToContext("suserName", true);
@@ -66,12 +45,9 @@ public class SignupCommand extends Command
 			String spassword = addToContext("spassword", true);
 			String gender = addToContext("gender", true);
 
-			if (verifyReCaptcha())
-			{
+			if (verifyReCaptcha()) {
 				log.debug("ReCaptcha answer was entered correctly!");
-			}
-			else
-			{
+			} else {
 				throw new Exception("Answer is wrong");
 			}
 
@@ -90,9 +66,7 @@ public class SignupCommand extends Command
 
 			UserDao userDao = (UserDao) ModelFactory.getImplementation(user);
 			return userDao.create();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			throw e;
 		}
 	}
