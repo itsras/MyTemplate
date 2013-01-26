@@ -4,9 +4,6 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	id="WebApp_ID" version="2.5">
 	<display-name>ClickToBuy</display-name>
-	<welcome-file-list>
-		<welcome-file>a</welcome-file>
-	</welcome-file-list>
 
 	<servlet>
 		<description>
@@ -30,7 +27,22 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>myServlet</servlet-name>
-		<url-pattern>/a</url-pattern>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>static</servlet-name>
+		<servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>static</servlet-name>
+		<url-pattern>*.js</url-pattern>
+		<url-pattern>*.css</url-pattern>
+		<url-pattern>*.ico</url-pattern>
+		<url-pattern>*.png</url-pattern>
+		<url-pattern>*.jpg</url-pattern>
+		<url-pattern>*.htc</url-pattern>
+		<url-pattern>*.gif</url-pattern>
 	</servlet-mapping>
 
 	<filter>
@@ -46,17 +58,17 @@
 
 	<error-page>
 		<exception-type>java.lang.Exception</exception-type>
-		<location>/servlet.html?page=error</location>
+		<location>/error</location>
 	</error-page>
 
 	<error-page>
 		<error-code>404</error-code>
-		<location>/servlet.html?page=error</location>
+		<location>/error</location>
 	</error-page>
 
 	<error-page>
 		<error-code>500</error-code>
-		<location>/servlet.html?page=error</location>
+		<location>/error</location>
 	</error-page>
 
 	<mime-mapping>

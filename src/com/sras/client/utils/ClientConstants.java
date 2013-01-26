@@ -1,23 +1,20 @@
 package com.sras.client.utils;
 
-import java.util.Hashtable;
 
-import com.sras.datamodel.UserData;
-
-public class ClientConstants
-{
-	public static final String servletPage = "a"; // This value should reflect
+public class ClientConstants {
+	public static final String servletPage = ""; // This value should reflect
 													// the same value defined
 													// for
 													// welcome-file and
 													// url-pattern in web.xml
 													// file
 	public static final String pageVerb = "page";
-	public static final String servletPageWithAction = servletPage + "?" + pageVerb + "=";
-	public static final String servletPageWithAjaxAction = servletPage + "?ajax=true&" + pageVerb
-			+ "=";
-	public static final String servletPageWithDefaultAction = servletPage + "?" + pageVerb
-			+ "=Home";
+	public static final String servletPageWithAction = servletPage + "?"
+			+ pageVerb + "=";
+	public static final String servletPageWithAjaxAction = servletPage
+			+ "?ajax=true&" + pageVerb + "=";
+	public static final String servletPageWithDefaultAction = servletPage + "?"
+			+ pageVerb + "=Home";
 
 	public static final String errorTextVariableName = "ErrorText";
 	public static final String dontUseFrameworkVariableName = "dontUseFramework";
@@ -38,7 +35,4 @@ public class ClientConstants
 
 	public static final String productName = "Click to Buy";
 	public static final String productCaption = "A place where you can get the things for free of cost!";
-
-	public static final Hashtable<String, UserData> sessions = new Hashtable<String, UserData>();
-
 }

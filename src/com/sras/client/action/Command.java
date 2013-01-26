@@ -113,7 +113,6 @@ public abstract class Command {
 			return doAjaxGet();
 		}
 		return null;
-
 	}
 
 	public String doPost() throws Exception {

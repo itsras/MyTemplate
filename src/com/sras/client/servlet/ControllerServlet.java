@@ -35,6 +35,7 @@ import com.sras.client.utils.SessionHelper;
 import com.sras.client.utils.Utilities;
 import com.sras.datamodel.UserData;
 
+@SuppressWarnings("deprecation")
 public class ControllerServlet extends VelocityServlet {
 	private static Category log = Category.getInstance(ControllerServlet.class);
 	private static Integer SESSION_TIMEOUT = null;
@@ -174,11 +175,12 @@ public class ControllerServlet extends VelocityServlet {
 		final HttpSession session = request.getSession();
 		long startTime = System.currentTimeMillis();
 
+		// To handle requests like contextroot/home
 		String contextPath = request.getContextPath();
 		String requestURI = request.getRequestURI();
 		String path = requestURI.substring(requestURI.indexOf(contextPath)
 				+ contextPath.length() + 1);
-
+		// To handle requests like contextroot/?page=home
 		String page = request.getParameter(ClientConstants.pageVerb);
 		if (path != null && path.trim().length() > 0
 				&& !path.equalsIgnoreCase(ClientConstants.servletPage)) {
@@ -338,16 +340,6 @@ public class ControllerServlet extends VelocityServlet {
 		}
 		return false;
 	}
-
-	// private static Hashtable<String, Object> commandMap = new
-	// Hashtable<String, Object>();
-	// static
-	// {
-	// commandMap.put("home", MainCommand.class);
-	// commandMap.put("error", "error.vm");
-	// commandMap.put("login", LoginCommand.class);
-	// commandMap.put("copyright", "copyright.vm");
-	// }
 
 	private void setDefaultContextVariables(HttpServletRequest request,
 			HttpServletResponse response, Context ctx) {
