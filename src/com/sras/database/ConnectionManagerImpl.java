@@ -8,10 +8,10 @@ import org.apache.log4j.Logger;
 
 import com.sras.datamodel.exceptions.TMException;
 
-public final class ConnectionManagerImpl
-{
+public final class ConnectionManagerImpl {
 
-	private static Logger logger = Logger.getLogger(ConnectionManagerImpl.class);
+	private static Logger logger = Logger
+			.getLogger(ConnectionManagerImpl.class);
 	private boolean initialized = false;
 	private String url;
 	private String user;
@@ -36,81 +36,66 @@ public final class ConnectionManagerImpl
 	private static final String VALIDATION_QUERY = "SELECT 1";
 	private static ConnectionManagerImpl instance = new ConnectionManagerImpl();
 
-	private ConnectionManagerImpl()
-	{
+	private ConnectionManagerImpl() {
 
 	}
 
-	public static ConnectionManagerImpl getConnectionManager()
-	{
+	public static ConnectionManagerImpl getConnectionManager() {
 		return instance;
 	}
 
-	public String getUrl()
-	{
+	public String getUrl() {
 		return url;
 	}
 
-	public void setUrl(String url)
-	{
+	public void setUrl(String url) {
 		this.url = url;
 	}
 
-	public String getUser()
-	{
+	public String getUser() {
 		return user;
 	}
 
-	public void setUser(String user)
-	{
+	public void setUser(String user) {
 		this.user = user;
 	}
 
-	public String getPassword()
-	{
+	public String getPassword() {
 		return password;
 	}
 
-	public void setPassword(String password)
-	{
+	public void setPassword(String password) {
 		this.password = password;
 	}
 
-	public int getMaxActive()
-	{
+	public int getMaxActive() {
 		return maxActive;
 	}
 
-	public void setMaxActive(int maxActive)
-	{
+	public void setMaxActive(int maxActive) {
 		this.maxActive = maxActive;
 	}
 
-	public int getMaxIdle()
-	{
+	public int getMaxIdle() {
 		return maxIdle;
 	}
 
-	public void setMaxIdle(int maxIdle)
-	{
+	public void setMaxIdle(int maxIdle) {
 		this.maxIdle = maxIdle;
 	}
 
-	public long getMaxWait()
-	{
+	public long getMaxWait() {
 		return maxWait;
 	}
 
-	public void setMaxWait(long maxWait)
-	{
+	public void setMaxWait(long maxWait) {
 		this.maxWait = maxWait;
 	}
 
 	/**
 	 * @return the initialSize
 	 */
-	public int getInitialSize()
-	{
+	public int getInitialSize() {
 		return initialSize;
 	}
 
@@ -118,16 +103,14 @@ public final class ConnectionManagerImpl
 	 * @param initialSize
 	 *            the initialSize to set
 	 */
-	public void setInitialSize(int initialSize)
-	{
+	public void setInitialSize(int initialSize) {
 		this.initialSize = initialSize;
 	}
 
 	/**
      *
      */
-	public synchronized void initialize()
-	{
+	public synchronized void initialize() {
 		if (initialized)
 			return;
 		logger.debug("Initializing data source");
@@ -155,22 +138,18 @@ public final class ConnectionManagerImpl
 	/**
 	 * cleaning up the connections that created by the BasicDataSource pool
 	 */
-	public void shutdownDriver()
-	{
-		if (initialized)
-		{
+	public void shutdownDriver() throws SQLException {
+		if (initialized) {
 			logger.debug("shutting down the data source for ");
-			try
-			{
-				if (bds != null)
-				{
+			try {
+				if (bds != null) {
 					bds.close();
 					logger.debug("finished shutting down the data source of type ");
 				}
-			}
-			catch (SQLException e)
-			{
-				logger.error("SQL Exception while shutting down connection pool ", e);
+			} catch (SQLException e) {
+				logger.error(
+						"SQL Exception while shutting down connection pool ", e);
+				throw e;
 			}
 		}
 	}
@@ -180,17 +159,13 @@ public final class ConnectionManagerImpl
 	 * 
 	 * @return Connection to the DB
 	 */
-	public Connection getConnection() throws TMException
-	{
+	public Connection getConnection() throws TMException {
 		logger.debug("Inside mySQLConnection method, trying to acquire MYSQL connection");
-		try
-		{
+		try {
 			if (!initialized)
 				initialize();
 			return bds.getConnection();
-		}
-		catch (SQLException sql)
-		{
+		} catch (SQLException sql) {
 			logger.error("Unable to get connection ..", sql);
 			throw new TMException("No Connection", sql.getMessage());
 		}
@@ -202,18 +177,13 @@ public final class ConnectionManagerImpl
 	 * @param conn
 	 * @throws TMException
 	 */
-	public static void rollback(Connection conn) throws TMException
-	{
-		try
-		{
-			if (conn != null && !conn.getAutoCommit())
-			{
+	public static void rollback(Connection conn) throws TMException {
+		try {
+			if (conn != null && !conn.getAutoCommit()) {
 				logger.info("Rolling back");
 				conn.rollback();
 			}
-		}
-		catch (SQLException e)
-		{
+		} catch (SQLException e) {
 			logger.error("Error while rolling back", e);
 			throw new TMException("SQL Exception", e.getMessage());
 		}
@@ -226,19 +196,14 @@ public final class ConnectionManagerImpl
 	 * @param conn
 	 *            db connection instance
 	 */
-	public void returnConnection(Connection conn) throws TMException
-	{
-		try
-		{
-			if (conn != null)
-			{
+	public void returnConnection(Connection conn) throws TMException {
+		try {
+			if (conn != null) {
 				conn.setAutoCommit(true);
 				conn.close();
 			}
 
-		}
-		catch (SQLException sql)
-		{
+		} catch (SQLException sql) {
 			logger.error("Unable to close connection object", sql);
 			throw new TMException("SQL Exception", sql.getMessage());
 		}
@@ -247,8 +212,7 @@ public final class ConnectionManagerImpl
 	/**
 	 * @return the minIdle
 	 */
-	public int getMinIdle()
-	{
+	public int getMinIdle() {
 		return minIdle;
 	}
 
@@ -256,16 +220,14 @@ public final class ConnectionManagerImpl
 	 * @param minIdle
 	 *            the minIdle to set
 	 */
-	public void setMinIdle(int minIdle)
-	{
+	public void setMinIdle(int minIdle) {
 		this.minIdle = minIdle;
 	}
 
 	/**
 	 * @return the driverName
 	 */
-	public String getDriverName()
-	{
+	public String getDriverName() {
 		return driverName;
 	}
 
@@ -273,8 +235,7 @@ public final class ConnectionManagerImpl
 	 * @param driverName
 	 *            the driverName to set
 	 */
-	public void setDriverName(String driverName)
-	{
+	public void setDriverName(String driverName) {
 		this.driverName = driverName;
 	}
 }

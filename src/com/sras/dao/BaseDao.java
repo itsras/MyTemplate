@@ -19,14 +19,12 @@ import com.sras.datamodel.exceptions.DataModelException;
 import com.sras.datamodel.exceptions.InvalidSQLValueException;
 import com.sras.datamodel.exceptions.TMException;
 
-public abstract class BaseDao
-{
+public abstract class BaseDao {
 	private static Logger logger = Logger.getLogger(BaseDao.class.getName());
 
 	protected DataModel datamodel;
-	
-	public BaseDao(DataModel datamodel)
-	{
+
+	public BaseDao(DataModel datamodel) {
 		this.datamodel = datamodel;
 	}
 
@@ -47,16 +45,15 @@ public abstract class BaseDao
 
 	public abstract boolean validateRules() throws TMException;
 
-	public Connection getConnection() throws TMException, SQLException
-	{
+	public Connection getConnection() throws TMException, SQLException {
 		return ConnectionManagerImpl.getConnectionManager().getConnection();
 	}
 
-	public void closeConnection(Connection connection) throws TMException, SQLException
-	{
-		if (connection != null && !connection.isClosed())
-		{
-			ConnectionManagerImpl.getConnectionManager().returnConnection(connection);
+	public void closeConnection(Connection connection) throws TMException,
+			SQLException {
+		if (connection != null && !connection.isClosed()) {
+			ConnectionManagerImpl.getConnectionManager().returnConnection(
+					connection);
 		}
 	}
 
@@ -65,8 +62,7 @@ public abstract class BaseDao
 	 *            PreparedStatement instance A convenience method for closing a
 	 *            statement only. Calls the three param close method.
 	 */
-	public void close(PreparedStatement stmt) throws TMException
-	{
+	public void close(PreparedStatement stmt) throws TMException {
 		close(stmt, null);
 	}
 
@@ -79,77 +75,42 @@ public abstract class BaseDao
 	 * @param rs
 	 *            the resultset to close
 	 */
-	public void close(PreparedStatement stmt, ResultSet rs) throws TMException
-	{
+	public void close(PreparedStatement stmt, ResultSet rs) throws TMException {
 		logger.debug("in close(pstmt, rset)");
 		if (rs != null)
-			try
-			{
+			try {
 				rs.close();
-			}
-			catch (SQLException se1)
-			{
+			} catch (SQLException se1) {
 				logger.error("Error closing resource resultset .", se1);
-				throw new TMException("RSET_CLOSE", "Unable to close the Resultset instance");
+				throw new TMException("RSET_CLOSE",
+						"Unable to close the Resultset instance");
 			}
 
 		if (stmt != null)
-			try
-			{
+			try {
 				stmt.close();
-			}
-			catch (SQLException se2)
-			{
+			} catch (SQLException se2) {
 				logger.error("Error closing resource statement.", se2);
-				throw new TMException("STMT_CLOSE", "Unable to close the statement instance");
+				throw new TMException("STMT_CLOSE",
+						"Unable to close the statement instance");
 			}
 	}
 
-	public static boolean isEmptyOrNull(String msg)
-	{
+	public static boolean isEmptyOrNull(String msg) {
 		return (msg == null || msg.trim().equalsIgnoreCase(""));
 	}
 
-	public void prepareStatmentAttribute(PreparedStatement pstmt, int type, String value, int count)
-			throws SQLException
-	{
-		if (value == null || value.trim().equalsIgnoreCase(""))
-			pstmt.setNull(count, type);
-		else
-		{
-			value = value.trim();
-			switch (type)
-			{
-				case java.sql.Types.VARCHAR:
-					pstmt.setString(count, value);
-					break;
-				case java.sql.Types.INTEGER:
-					long l = Long.parseLong(value);
-					if (l <= 0)
-						pstmt.setNull(count, type);
-					else
-						pstmt.setInt(count, Integer.parseInt(value));
-					break;
-				case java.sql.Types.BOOLEAN:
-					pstmt.setBoolean(count, Boolean.valueOf(value));
-					break;
-				default:
-					throw new SQLException("INVALID_DATA_TYPE");
-			}
-
-		}
-	}
-
-	protected void bindVariables(PreparedStatement statement, Object[] data) throws SQLException
-	{
-		for (int i = 0; i < data.length; i++)
-		{
+	protected void bindVariables(PreparedStatement statement, Object[] data)
+			throws SQLException {
+		for (int i = 0; i < data.length; i++) {
 			if (data[i] == null)
-				throw new InvalidSQLValueException("NULL SQLValue object in bindVariables");
+				throw new InvalidSQLValueException(
+						"NULL SQLValue object in bindVariables");
 
 			if (!(data[i] instanceof SQLValue))
 				throw new InvalidSQLValueException("Bind variable type "
-						+ data[i].getClass().getName() + " should be of type SQLValue");
+						+ data[i].getClass().getName()
+						+ " should be of type SQLValue");
 			SQLValue val = (SQLValue) data[i];
 			int type = val.getType(); // java.sql.Types
 			Object obj = val.getValue();
@@ -157,19 +118,16 @@ public abstract class BaseDao
 			if (val.isNull())
 				statement.setNull(i + 1, val.getType());
 			else if (type == OracleTypes.RAW)
-				try
-				{
-					if (obj instanceof InputStream)
-					{
+				try {
+					if (obj instanceof InputStream) {
 						InputStream stream = (InputStream) val.getValue();
-						statement.setBinaryStream(i + 1, stream, stream.available());
-					}
-					else if (obj instanceof byte[])
+						statement.setBinaryStream(i + 1, stream,
+								stream.available());
+					} else if (obj instanceof byte[])
 						statement.setBytes(i + 1, (byte[]) obj);
-				}
-				catch (IOException e)
-				{
-					throw new InvalidSQLValueException("Failure to retrieve SQL BinaryStream value");
+				} catch (IOException e) {
+					throw new InvalidSQLValueException(
+							"Failure to retrieve SQL BinaryStream value");
 				}
 			else if (type == java.sql.Types.VARCHAR)
 				statement.setString(i + 1, obj.toString());
@@ -195,24 +153,20 @@ public abstract class BaseDao
 	 * @return int The result of the statement.executeUpdate() call
 	 * @throws SQLException
 	 *             If bad stuff happens
-	 * @throws TMException 
+	 * @throws TMException
 	 */
-	protected int executeUpdate(String sql, Collection<SQLValue> bindVars) throws DataModelException,
-			SQLException, TMException
-	{
+	protected int executeUpdate(String sql, Collection<SQLValue> bindVars)
+			throws DataModelException, SQLException, TMException {
 		PreparedStatement statement = null;
-		try
-		{
-			Connection connection = getConnection(); 
+		try {
+			Connection connection = getConnection();
 			statement = connection.prepareStatement(sql);
 			if (bindVars != null)
 				bindVariables(statement, bindVars.toArray());
-				logger.debug("executeUpdate: " + sql + ", bindVars: "
-						+ (bindVars == null ? "none" : bindVars.toString()));
+			logger.debug("executeUpdate: " + sql + ", bindVars: "
+					+ (bindVars == null ? "none" : bindVars.toString()));
 			return statement.executeUpdate();
-		}
-		finally
-		{
+		} finally {
 			if (statement != null)
 				statement.close();
 			statement = null;
@@ -231,9 +185,8 @@ public abstract class BaseDao
 	 *             If bad stuff happens
 	 * @throws TMException
 	 */
-	protected ResultSet executeQuery(String sql, Collection<SQLValue> bindVars) throws DataModelException,
-			SQLException, TMException
-	{
+	protected ResultSet executeQuery(String sql, Collection<SQLValue> bindVars)
+			throws DataModelException, SQLException, TMException {
 		return executeQuery(sql, bindVars, ResultSet.TYPE_FORWARD_ONLY);
 	}
 
@@ -251,12 +204,12 @@ public abstract class BaseDao
 	 *             If bad stuff happens
 	 * @throws TMException
 	 */
-	protected ResultSet executeQuery(String sql, Collection<SQLValue> bindVars, int resultSetType)
-			throws DataModelException, SQLException, TMException
-	{
+	protected ResultSet executeQuery(String sql, Collection<SQLValue> bindVars,
+			int resultSetType) throws DataModelException, SQLException,
+			TMException {
 		Connection connection = getConnection();
-		PreparedStatement statement = connection.prepareStatement(sql, resultSetType,
-				ResultSet.CONCUR_READ_ONLY);
+		PreparedStatement statement = connection.prepareStatement(sql,
+				resultSetType, ResultSet.CONCUR_READ_ONLY);
 		if (bindVars != null)
 			bindVariables(statement, bindVars.toArray());
 

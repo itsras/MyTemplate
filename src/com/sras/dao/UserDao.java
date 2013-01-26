@@ -35,7 +35,6 @@ public class UserDao extends BaseDao {
 		if (read() != null)
 			throw new SQLException("USER_EXISTS", "User Name already in use");
 
-		ResultSet rst = null;
 		try {
 			String sql = CREATE_USER;
 			Collection<SQLValue> bindVars = new ArrayList<SQLValue>();
@@ -58,8 +57,6 @@ public class UserDao extends BaseDao {
 		} catch (SQLException sql) {
 			logger.error("SQL-Exception", sql);
 			throw new TMException("SQL-Exception", sql.getLocalizedMessage());
-		} finally {
-			close(null, rst);
 		}
 	}
 
