@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Category;
 import org.apache.velocity.context.Context;
 
+import com.sras.client.utils.MailUtils;
 import com.sras.client.utils.Utilities;
 
 public class MainCommand extends Command {
@@ -25,6 +26,7 @@ public class MainCommand extends Command {
 	public String doGet() throws Exception {
 		String hostName = Utilities.getRemoteHostName(request);
 		ctx.put("hostName", hostName);
+		//MailUtils.sendMail("itsras@gmail.com", "Test Mail", "Test Mail");
 		return TEMPLATE_NAME;
 	}
 

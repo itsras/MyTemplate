@@ -35,4 +35,9 @@ public class ClientConstants {
 
 	public static final String productName = "Click to Buy";
 	public static final String productCaption = "A place where you can get the things for free of cost!";
+
+	public static final String SMTP_HOST = "smtp.gmail.com";
+	public static final String FROM_ADDRESS = "******@gmail.com";
+	public static final String PASSWORD = "*********";
+	public static final String FROM_NAME = "**********";
 }
