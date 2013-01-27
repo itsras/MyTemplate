@@ -353,11 +353,15 @@ public class ControllerServlet extends VelocityServlet {
 		ctx.put("productName", ClientConstants.productName);
 		ctx.put("productCaption", ClientConstants.productCaption);
 
+		String contextPath = request.getContextPath();
+		ctx.put("contextPath", contextPath);
+
 		ctx.put("servletPage", ClientConstants.servletPage);
 		ctx.put("actionVerb", ClientConstants.pageVerb);
-		ctx.put("servletPageWithAction", ClientConstants.servletPageWithAction);
-		ctx.put("servletPageWithAjaxAction",
-				ClientConstants.servletPageWithAjaxAction);
+		ctx.put("servletPageWithAction", contextPath + "/"
+				+ ClientConstants.servletPageWithAction);
+		ctx.put("servletPageWithAjaxAction", contextPath + "/"
+				+ ClientConstants.servletPageWithAjaxAction);
 
 		ctx.put("captchaPublicKey", ClientConstants.RECAPTCHA_PUBLIC_KEY);
 		HttpSession session = request.getSession();
@@ -372,9 +376,6 @@ public class ControllerServlet extends VelocityServlet {
 		String requestedURL = Utilities.getRequestedURL(request);
 		ctx.put("currentURL", requestedURL);
 		ctx.put("currentRequest", request);
-
-		String contextPath = request.getContextPath();
-		ctx.put("contextPath", contextPath);
 	}
 
 	private void showHeader(Context ctx, String template) {

@@ -147,7 +147,7 @@ public class LoginCommand extends Command {
 		}
 
 		redirectToPrevUrl();
-		return ClientConstants.servletPage;
+		return "index.vm";
 	}
 
 	private void redirectToPrevUrl() throws UnsupportedEncodingException,
