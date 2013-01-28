@@ -50,9 +50,11 @@ public class SessionHelper {
 		userDao.update();
 	}
 
-	public static void deleteUserSession(String uuid) throws Exception {
+	public static void deleteUserSession(String uuid, long userId)
+			throws Exception {
 		UserSessionData userSessionData = new UserSessionData();
 		userSessionData.setSessionId(uuid);
+		userSessionData.setUserId(userId);
 
 		UserSessionDao userDao = (UserSessionDao) ModelFactory
 				.getImplementation(userSessionData);
@@ -74,6 +76,15 @@ public class SessionHelper {
 			return (UserData) userDao.read();
 		}
 		return null;
-
 	}
+
+	public static UserSessionData getUserSession(String uuid) throws Exception {
+		UserSessionData userSessionData = new UserSessionData();
+		userSessionData.setSessionId(uuid);
+		UserSessionDao userSessionDao = (UserSessionDao) ModelFactory
+				.getImplementation(userSessionData);
+		userSessionData = (UserSessionData) userSessionDao.read();
+		return userSessionData;
+	}
+
 }

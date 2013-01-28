@@ -1,5 +1,7 @@
 package com.sras.client.action;
 
+import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -8,6 +10,7 @@ import org.apache.velocity.context.Context;
 
 import com.sras.client.utils.AuthenticationUtils;
 import com.sras.client.utils.ClientConstants;
+import com.sras.client.utils.MailUtils;
 import com.sras.dao.ModelFactory;
 import com.sras.dao.UserDao;
 import com.sras.datamodel.UserData;
@@ -23,7 +26,8 @@ public class SignupCommand extends Command {
 
 	public String doPost() throws Exception {
 		try {
-			handleSignup(request, response, ctx);
+			String activationKey = UUID.randomUUID().toString()+UUID.randomUUID().toString();
+			handleSignup(request, response, ctx, activationKey);
 			LoginCommand lc = new LoginCommand(request, response, ctx);
 			TEMPLATE_NAME = lc.execute();
 		} catch (Exception e) {
@@ -36,7 +40,7 @@ public class SignupCommand extends Command {
 	}
 
 	private long handleSignup(HttpServletRequest request,
-			HttpServletResponse response, Context ctx) throws Exception {
+			HttpServletResponse response, Context ctx, String activationKey) throws Exception {
 		try {
 			String firstName = addToContext("firstName", true);
 			String lastName = addToContext("lastName", true);
@@ -58,11 +62,13 @@ public class SignupCommand extends Command {
 			UserData user = new UserData();
 			user.setUserName(suserName);
 			user.setPassword(AuthenticationUtils.createPassword(spassword));
-			user.setDob("10-AUG-82");
+			user.setDob(null);
 			user.setFirstName(firstName);
 			user.setLastName(lastName);
 			user.setMailId(suserName);
 			user.setSex(sex);
+			user.setActive(false);
+			user.setActivationKey(activationKey);
 
 			UserDao userDao = (UserDao) ModelFactory.getImplementation(user);
 			return userDao.create();

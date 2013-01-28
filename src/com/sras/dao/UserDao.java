@@ -51,6 +51,8 @@ public class UserDao extends BaseDao {
 			bindVars.add(SQLValue.Long(user.getAddressId()));
 			bindVars.add(SQLValue.String(user.getMaritalStatus()));
 			bindVars.add(SQLValue.String(user.getNationality()));
+			bindVars.add(SQLValue.Boolean(user.isActive()));
+			bindVars.add(SQLValue.String(user.getActivationKey()));
 
 			logger.debug("QUERY - Loading Address :" + sql);
 			return executeUpdate(sql, bindVars);
@@ -81,6 +83,8 @@ public class UserDao extends BaseDao {
 			bindVars.add(SQLValue.Long(user.getAddressId()));
 			bindVars.add(SQLValue.String(user.getMaritalStatus()));
 			bindVars.add(SQLValue.String(user.getNationality()));
+			bindVars.add(SQLValue.Boolean(user.isActive()));
+			bindVars.add(SQLValue.String(user.getActivationKey()));
 			bindVars.add(SQLValue.Long(user.getId()));
 
 			logger.debug("QUERY - Loading Address :" + sql);
@@ -198,13 +202,15 @@ public class UserDao extends BaseDao {
 		user.setMaritalStatus(rst.getString(MARITAL_STATUS));
 		user.setNationality(rst.getString(NATIONALITY));
 		user.setImage(rst.getObject(IMAGE));
+		user.setActive(rst.getBoolean(IS_ACTIVE));
+		user.setActivationKey(rst.getString(ACTIVATION_KEY));
 		return user;
 	}
 
 	public static final String READ_USER = "SELECT * FROM `USER` WHERE 1=1 ";
-	public static final String DELETE_USER = "DELETE * FROM `USER` WHERE 1=1 ";
-	public static final String UPDATE_USER = "UPDATE `USER` SET `USER_NAME` = ? ,`FIRST_NAME` = ? ,`MIDDLE_NAME` = ? ,`LAST_NAME` = ? ,`EMAIL_ID` = ? ,`PASSWORD` = ? ,`IMAGE` = ? ,`DOB` = ? ,`SEX` = ? ,`ADDRESS_ID` = ? ,`MARITAL_STATUS` = ? ,`NATIONALITY` = ? WHERE `ID` = ?";
-	public static final String CREATE_USER = "INSERT INTO `USER` (`USER_NAME`,`FIRST_NAME`,`MIDDLE_NAME`,`LAST_NAME`,`EMAIL_ID`,`PASSWORD`,`IMAGE`,`DOB`,`SEX`,`ADDRESS_ID`,`MARITAL_STATUS`,`NATIONALITY`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	public static final String DELETE_USER = "DELETE FROM `USER` WHERE 1=1 ";
+	public static final String UPDATE_USER = "UPDATE `USER` SET `USER_NAME` = ? ,`FIRST_NAME` = ? ,`MIDDLE_NAME` = ? ,`LAST_NAME` = ? ,`EMAIL_ID` = ? ,`PASSWORD` = ? ,`IMAGE` = ? ,`DOB` = ? ,`SEX` = ? ,`ADDRESS_ID` = ? ,`MARITAL_STATUS` = ? ,`NATIONALITY` = ?,`IS_ACTIVE` = ?,`ACTIVATION_KEY` = ? WHERE `ID` = ?";
+	public static final String CREATE_USER = "INSERT INTO `USER` (`USER_NAME`,`FIRST_NAME`,`MIDDLE_NAME`,`LAST_NAME`,`EMAIL_ID`,`PASSWORD`,`IMAGE`,`DOB`,`SEX`,`ADDRESS_ID`,`MARITAL_STATUS`,`NATIONALITY`,`IS_ACTIVE`,`ACTIVATION_KEY`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	public static final String USER_NAME = "USER_NAME";
 	public static final String PASSWORD = "PASSWORD";
@@ -220,5 +226,7 @@ public class UserDao extends BaseDao {
 	public static final String EMAIL_ID = "EMAIL_ID";
 	public static final String CURRENCY_CODE_ID = "CURRENCY_CODE_ID";
 	public static final String NATIONALITY = "NATIONALITY";
+	public static final String IS_ACTIVE = "IS_ACTIVE";
+	public static final String ACTIVATION_KEY = "ACTIVATION_KEY";
 
 }

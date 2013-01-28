@@ -34,6 +34,7 @@ import com.sras.client.utils.Formatter;
 import com.sras.client.utils.SessionHelper;
 import com.sras.client.utils.Utilities;
 import com.sras.datamodel.UserData;
+import com.sras.datamodel.UserSessionData;
 
 @SuppressWarnings("deprecation")
 public class ControllerServlet extends VelocityServlet {
@@ -234,31 +235,50 @@ public class ControllerServlet extends VelocityServlet {
 			HttpServletResponse response, Context ctx, String page)
 			throws Exception, IOException, ServletException {
 		HttpSession session = request.getSession();
-		boolean noLoginRequired = pageDoesNotRequireLogin(page);
-		String userName = (session == null) ? null : (String) session
-				.getAttribute("userName");
 
-		if (userName != null) {
-			return;
-		}
-		String uuid = Utilities.getCookieValue(request,
+		boolean noLoginRequired = pageDoesNotRequireLogin(page);
+		String puuid = Utilities.getCookieValue(request,
 				ClientConstants.COOKIE_NAME);
-		if (userName == null && uuid != null) {
-			log.debug("Before Login UUID ::" + uuid);
-			UserData user = SessionHelper.getUserFromSession(uuid);
-			if (user != null) {
-				LoginCommand.setLoginAttributes(session, request,
-						user.getUserName(), user.getPassword());
-				page = (page == null || page.equalsIgnoreCase("login")) ? "home"
-						: page;
-				SessionHelper.updateUserSession(request, uuid, user.getId(), 0);
-			} else {
+		String suuid = (String) session.getAttribute("uuid");
+
+		if (suuid != null && puuid == null) {
+			UserSessionData usd = SessionHelper.getUserSession(suuid);
+			if (usd == null && !noLoginRequired) {
+				removeSesstionAttributes(session);
+				Command.redirectToLoginPage(request, response, ctx);
+			}
+		} else if (suuid != null && puuid != null) {
+			UserSessionData usd = SessionHelper.getUserSession(suuid);
+			if (usd == null && !noLoginRequired) {
+				removeSesstionAttributes(session);
+				Command.redirectToLoginPage(request, response, ctx);
+			}
+		} else if (suuid == null && puuid != null) {
+			log.debug("Before Login UUID ::" + puuid);
+			UserData user = SessionHelper.getUserFromSession(puuid);
+			if (user == null && !noLoginRequired) {
+				removeSesstionAttributes(session);
 				Utilities.removeCookie(response, ClientConstants.COOKIE_NAME);
 				Command.redirectToLoginPage(request, response, ctx);
 			}
-		} else if (userName == null && !noLoginRequired) {
+			if (user != null) {
+				SessionHelper
+						.updateUserSession(request, puuid, user.getId(), 0);
+				LoginCommand.setLoginAttributes(session, request, user, puuid,
+						LoginCommand.LoginType.COOKIE_BASED_AUTHENTICATION
+								.toString());
+			}
+		} else if (suuid == null && puuid == null && !noLoginRequired) {
+			removeSesstionAttributes(session);
 			Command.redirectToLoginPage(request, response, ctx);
 		}
+	}
+
+	private static void removeSesstionAttributes(HttpSession session) {
+		session.setAttribute("userName", null);
+		session.setAttribute("password", null);
+		session.setAttribute("User", null);
+		session.setAttribute("uuid", null);
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -319,20 +339,32 @@ public class ControllerServlet extends VelocityServlet {
 			throws IOException {
 		if (page != null && page.equalsIgnoreCase("logout")) {
 			synchronized (session) {
-				session.setAttribute("userName", null);
-				session.setAttribute("password", null);
-				session.setAttribute("User", null);
-				session.invalidate();
+				UserData user = (UserData) session.getAttribute("user");
+				if (user == null) {
+					Command.redirectToURL(request, response,
+							ClientConstants.servletPageWithAction + "login");
+					return true;
+				}
+				removeSesstionAttributes(session);
 				String uuid = Utilities.getCookieValue(request,
 						ClientConstants.COOKIE_NAME);
 				if (uuid != null) {
 					try {
-						SessionHelper.deleteUserSession(uuid);
+						SessionHelper.deleteUserSession(uuid, user.getId());
+					} catch (Exception e) {
+						log.error("Failed to delete the session", e);
+					}
+					Utilities.removeCookie(response,
+							ClientConstants.COOKIE_NAME);
+				} else if (session.getAttribute("uuid") != null) {
+					try {
+						uuid = (String) session.getAttribute("uuid");
+						SessionHelper.deleteUserSession(uuid, user.getId());
 					} catch (Exception e) {
 						log.error("Failed to delete the session", e);
 					}
 				}
-				Utilities.removeCookie(response, ClientConstants.COOKIE_NAME);
+				session.invalidate();
 			}
 			Command.redirectToURL(request, response,
 					ClientConstants.servletPageWithAction + "login");

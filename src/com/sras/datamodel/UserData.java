@@ -15,6 +15,8 @@ public class UserData extends WithId
 	private String nationality;
 	private transient String password;
 	private String mailId;
+	private boolean isActive;
+	private String activationKey;
 
 	public String getUserName()
 	{
@@ -144,5 +146,21 @@ public class UserData extends WithId
 	public void setMailId(String mailId)
 	{
 		this.mailId = mailId;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+
+	public String getActivationKey() {
+		return activationKey;
+	}
+
+	public void setActivationKey(String activationKey) {
+		this.activationKey = activationKey;
 	}
 }

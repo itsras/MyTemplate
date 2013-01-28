@@ -1,6 +1,5 @@
 package com.sras.client.utils;
 
-
 public class ClientConstants {
 	public static final String servletPage = ""; // This value should reflect
 													// the same value defined
@@ -30,7 +29,8 @@ public class ClientConstants {
 	public static final String RECAPTCHA_PUBLIC_KEY = "6LfPgNsSAAAAAASO2ef1Y4jeOy0kvWSSfIkyVcBo";
 	public static final String RECAPTCHA_PRIVATE_KEY = "6LfPgNsSAAAAAP_J8UgX4SKhU075ar1blw0VR5zx";
 
-	public static final int COOKIE_AGE = 2592000;
+	public static final int COOKIE_AGE = 10080;
+	public static final int PERSISTANCE_COOKIE_AGE = 2592000;
 	public static final String COOKIE_NAME = "6LfPgNsSAAAAAASO2ef1Y4jeOy0kvWSSfIkyVcBo";
 
 	public static final String productName = "Click to Buy";
@@ -40,4 +40,6 @@ public class ClientConstants {
 	public static final String FROM_ADDRESS = "******@gmail.com";
 	public static final String PASSWORD = "*********";
 	public static final String FROM_NAME = "**********";
+
+	public static final String LoginType = "LoginType";
 }

@@ -52,7 +52,8 @@ public class UserSessionDao extends BaseDao {
 			bindVars.add(SQLValue.Timestamp(userSession.getCreateTime()));
 			bindVars.add(SQLValue.Timestamp(userSession.getLastUpdateTime()));
 			bindVars.add(SQLValue.String(userSession.getLanguage()));
-			bindVars.add(SQLValue.String(userSession.getEncryptionKey()));
+			bindVars.add(SQLValue.String(userSession.getPublicKey()));
+			bindVars.add(SQLValue.String(userSession.getPrivateKey()));
 			bindVars.add(SQLValue.Long(userSession.getTimeout()));
 			bindVars.add(SQLValue.String(userSession.getIpAddress()));
 			bindVars.add(SQLValue.String(userSession.getHostName()));
@@ -79,7 +80,8 @@ public class UserSessionDao extends BaseDao {
 			Collection<SQLValue> bindVars = new ArrayList<SQLValue>();
 
 			bindVars.add(SQLValue.Long(userSession.getTimeout()));
-			bindVars.add(SQLValue.String(userSession.getEncryptionKey()));
+			bindVars.add(SQLValue.String(userSession.getPublicKey()));
+			bindVars.add(SQLValue.String(userSession.getPrivateKey()));
 			bindVars.add(SQLValue.String(userSession.getSessionId()));
 			bindVars.add(SQLValue.Long(userSession.getUserId()));
 
@@ -183,7 +185,8 @@ public class UserSessionDao extends BaseDao {
 		userSession.setCreateTime(rst.getDate(CREATE_TIME));
 		userSession.setLastUpdateTime(rst.getDate(LAST_MODIFY_TIME));
 		userSession.setLanguage(rst.getString(LANGUAGE));
-		userSession.setEncryptionKey(rst.getString(ENCRYPTION_KEY));
+		userSession.setPublicKey(rst.getString(PUBLIC_KEY));
+		userSession.setPrivateKey(rst.getString(PRIVATE_KEY));
 		userSession.setTimeout(rst.getLong(TIMEOUT));
 		userSession.setIpAddress(rst.getString(IP_ADDRESS));
 		userSession.setHostName(rst.getString(HOST_NAME));
@@ -194,16 +197,17 @@ public class UserSessionDao extends BaseDao {
 	}
 
 	public static final String READ_USER_SESSION = "SELECT * FROM `USER_SESSIONS` WHERE 1=1 ";
-	public static final String DELETE_USER_SESSION = "DELETE * FROM `USER_SESSIONS` WHERE 1=1 ";
-	public static final String UPDATE_USER_SESSION = "UPDATE `USER_SESSIONS` SET `TIMEOUT` = ? ,`ENCRYPTION_KEY` = ? WHERE `SESSION_ID` = ? AND `USER_ID` = ?";
-	public static final String CREATE_USER_SESSION = "INSERT INTO `USER_SESSIONS` (`SESSION_ID`,`USER_ID`,`CREATE_TIME`,`LAST_MODIFY_TIME`,`LANGUAGE`,`ENCRYPTION_KEY`,`TIMEOUT`,`IP_ADDRESS`,`HOST_NAME`,`BROWSER`,`COUNTRY`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	public static final String DELETE_USER_SESSION = "DELETE FROM `USER_SESSIONS` WHERE 1=1 ";
+	public static final String UPDATE_USER_SESSION = "UPDATE `USER_SESSIONS` SET `TIMEOUT` = ? ,`PUBLIC_KEY` = ?, `PRIVATE_KEY` = ? WHERE `SESSION_ID` = ? AND `USER_ID` = ?";
+	public static final String CREATE_USER_SESSION = "INSERT INTO `USER_SESSIONS` (`SESSION_ID`,`USER_ID`,`CREATE_TIME`,`LAST_MODIFY_TIME`,`LANGUAGE`,`PUBLIC_KEY`,`PRIVATE_KEY`,`TIMEOUT`,`IP_ADDRESS`,`HOST_NAME`,`BROWSER`,`COUNTRY`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	public static final String SESSION_ID = "SESSION_ID";
 	public static final String USER_ID = "USER_ID";
 	public static final String CREATE_TIME = "CREATE_TIME";
 	public static final String LAST_MODIFY_TIME = "LAST_MODIFY_TIME";
 	public static final String LANGUAGE = "LANGUAGE";
-	public static final String ENCRYPTION_KEY = "ENCRYPTION_KEY";
+	public static final String PUBLIC_KEY = "PUBLIC_KEY";
+	public static final String PRIVATE_KEY = "PRIVATE_KEY";
 	public static final String TIMEOUT = "TIMEOUT";
 	public static final String IP_ADDRESS = "IP_ADDRESS";
 	public static final String HOST_NAME = "HOST_NAME";

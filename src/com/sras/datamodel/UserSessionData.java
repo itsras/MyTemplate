@@ -9,7 +9,8 @@ public class UserSessionData implements DataModel{
 	private Date createTime;
 	private Date lastUpdateTime;
 	private String language;
-	private String encryptionKey;
+	private String publicKey;
+	private String privateKey;
 	private long timeout;
 	private String ipAddress;
 	private String hostName;
@@ -56,12 +57,20 @@ public class UserSessionData implements DataModel{
 		this.language = language;
 	}
 
-	public String getEncryptionKey() {
-		return encryptionKey;
+	public String getPublicKey() {
+		return publicKey;
 	}
 
-	public void setEncryptionKey(String encryptionKey) {
-		this.encryptionKey = encryptionKey;
+	public void setPublicKey(String publicKey) {
+		this.publicKey = publicKey;
+	}
+
+	public String getPrivateKey() {
+		return privateKey;
+	}
+
+	public void setPrivateKey(String privateKey) {
+		this.privateKey = privateKey;
 	}
 
 	public long getTimeout() {

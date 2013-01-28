@@ -23,6 +23,10 @@ import com.sras.datamodel.UserData;
 public class LoginCommand extends Command {
 	protected static Category log = Category.getInstance(LoginCommand.class);
 
+	public static enum LoginType {
+		FULL_AUTHENTICATION, COOKIE_BASED_AUTHENTICATION
+	};
+
 	public LoginCommand(HttpServletRequest request,
 			HttpServletResponse response, Context ctx) {
 		super(request, response, ctx);
@@ -122,9 +126,6 @@ public class LoginCommand extends Command {
 			if (user == null) {
 				throw new LoginException("Invalid Credentials!");
 			}
-
-			setLoginAttributes(request.getSession(), request,
-					user.getUserName(), user.getPassword());
 			log.debug("login attributes set");
 		} catch (Exception e) {
 			// request.getSession().invalidate();
@@ -135,16 +136,18 @@ public class LoginCommand extends Command {
 			throw e;
 		}
 
+		int timeOut = ClientConstants.COOKIE_AGE;
+		String uuid = UUID.randomUUID().toString();
 		if (rememberUserName) {
-			String uuid = UUID.randomUUID().toString();
 			// String encryptedUuid = Encryption.encrypt(uuid);
 			Utilities.addCookie(response, ClientConstants.COOKIE_NAME, uuid,
 					ClientConstants.COOKIE_AGE);
 			// ClientConstants.sessions.put(uuid, user);
-			SessionHelper.createUserSession(request, uuid, user.getId(),
-					ClientConstants.COOKIE_AGE);
-			log.debug("After Login UUID ::" + uuid);
+			timeOut = ClientConstants.PERSISTANCE_COOKIE_AGE;
 		}
+		setLoginAttributes(request.getSession(), request, user, uuid, LoginType.FULL_AUTHENTICATION.toString());
+		SessionHelper.createUserSession(request, uuid, user.getId(), timeOut);
+		log.debug("After Login UUID ::" + uuid);
 
 		redirectToPrevUrl();
 		return "index.vm";
@@ -178,11 +181,15 @@ public class LoginCommand extends Command {
 	}
 
 	public static void setLoginAttributes(HttpSession session,
-			HttpServletRequest request, String userName, String password)
-			throws Exception
+			HttpServletRequest request, UserData user, String uuid,
+			String loginType) throws Exception
 
 	{
+		String userName = user.getUserName();
 		session.setAttribute("userName", userName);
+		session.setAttribute("user", user);
+		session.setAttribute("uuid", uuid);
+		session.setAttribute(ClientConstants.LoginType, loginType);
 		// session.setAttribute("password", password);
 
 		log.info("User " + userName + " logged in from "

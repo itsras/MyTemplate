@@ -224,7 +224,7 @@ public class AddressDao extends BaseDao {
 	public static final String AREA_CODE = "AREA_CODE";
 	public static final String LAND_MARK = "LAND_MARK";
 
-	public static final String DELETE_USER_ADDRESS = "DELETE * FROM `ADDRESS` WHERE 1=1 ";
+	public static final String DELETE_USER_ADDRESS = "DELETE FROM `ADDRESS` WHERE 1=1 ";
 	public static final String LOAD_USER_ADDRESS = "SELECT * FROM `ADDRESS` WHERE 1=1 ";
 	public static final String CREATE_USER_ADDRESS = "INSERT INTO `ADDRESS` (`BLD_NAME`, `BLD_NUM`, `STREET`, `LOCALITY_NAME`, `LAND_MARK`, `CITY`, `STATE`, `POSTAL_CODE`, `COUNTRY`, `MOBILE_NUMBER`, `LAND_LINE_NUMBER`, AREA_CODE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	public static final String IS_ADDRESS_EXISTS = "SELECT COUNT(*), `ID` FROM `ADDRESS` WHERE ";

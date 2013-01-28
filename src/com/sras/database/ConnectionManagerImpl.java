@@ -124,7 +124,7 @@ public final class ConnectionManagerImpl {
 		bds.setMaxOpenPreparedStatements(120);
 		bds.setPoolPreparedStatements(true);
 		bds.setMinIdle(2);
-		bds.setMaxIdle(3);
+		bds.setMaxIdle(10);
 		bds.setMaxWait(300000);
 		bds.setMinEvictableIdleTimeMillis(60000);
 		bds.setTimeBetweenEvictionRunsMillis(10000);
