@@ -149,11 +149,11 @@ public class LoginCommand extends Command {
 		SessionHelper.createUserSession(request, uuid, user.getId(), timeOut);
 		log.debug("After Login UUID ::" + uuid);
 
-		redirectToPrevUrl();
-		return "index.vm";
+		redirectToPrevUrl(ClientConstants.servletPageWithDefaultAction);
+		return null;
 	}
 
-	private void redirectToPrevUrl() throws UnsupportedEncodingException,
+	private void redirectToPrevUrl(String homePage) throws UnsupportedEncodingException,
 			IOException {
 		String prevURLobject = (String) request.getSession().getAttribute(
 				ClientConstants.loginRequest);
@@ -177,6 +177,10 @@ public class LoginCommand extends Command {
 		if (prevURL.length() > 0) {
 			log.info("About to redirect to " + prevURL);
 			Command.redirectToURL(request, response, prevURL);
+		}
+		else
+		{
+			Command.redirectToURL(request, response, homePage);
 		}
 	}
 

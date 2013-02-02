@@ -10,7 +10,6 @@ import org.apache.velocity.context.Context;
 
 import com.sras.client.utils.AuthenticationUtils;
 import com.sras.client.utils.ClientConstants;
-import com.sras.client.utils.MailUtils;
 import com.sras.dao.ModelFactory;
 import com.sras.dao.UserDao;
 import com.sras.datamodel.UserData;
@@ -45,7 +44,6 @@ public class SignupCommand extends Command {
 			String firstName = addToContext("firstName", true);
 			String lastName = addToContext("lastName", true);
 			String suserName = addToContext("suserName", true);
-			String suserName1 = addToContext("suserName1", true);
 			String spassword = addToContext("spassword", true);
 			String gender = addToContext("gender", true);
 

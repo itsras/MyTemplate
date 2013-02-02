@@ -151,7 +151,6 @@ public class Utilities
 		addCookie(response, name, null, 0);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void markSessionAsAccessed(final HttpSession session)
 	{
 		log.debug("mark the session as accessed at the end of the request, not just the	beginning");
@@ -160,12 +159,12 @@ public class Utilities
 		if (session instanceof StandardSessionFacade)
 		{
 			final StandardSessionFacade standardSessionFacade = (StandardSessionFacade) session;
-			final Class standardSessionFacadeClass = StandardSessionFacade.class;
-			AccessController.doPrivileged(new PrivilegedAction()
+			final Class<StandardSessionFacade> standardSessionFacadeClass = StandardSessionFacade.class;
+			AccessController.doPrivileged(new PrivilegedAction<Object>()
 			{
 				public Object run()
 				{
-					try
+					try 
 					{
 						Field sessionField = standardSessionFacadeClass.getDeclaredField("session");
 						sessionField.setAccessible(true);

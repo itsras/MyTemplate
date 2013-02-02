@@ -22,8 +22,8 @@ public class SessionHelper {
 		userSessionData.setBrowser(request.getHeader("User-Agent"));
 		userSessionData.setLanguage(locale.getLanguage());
 		userSessionData.setCountry(locale.getDisplayCountry());
-		userSessionData.setHostName(request.getHeader("Host"));
-		userSessionData.setIpAddress(request.getLocalAddr());
+		userSessionData.setHostName(request.getRemoteHost());
+		userSessionData.setIpAddress(request.getRemoteAddr());
 
 		UserSessionDao userDao = (UserSessionDao) ModelFactory
 				.getImplementation(userSessionData);

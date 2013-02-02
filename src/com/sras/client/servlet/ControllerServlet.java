@@ -290,7 +290,6 @@ public class ControllerServlet extends VelocityServlet {
 		// Log the request
 		logTheRequest(request, session);
 
-		// TODO: Handle exceptions
 		page = (page == null || page.length() == 0) ? "Home" : page;
 
 		String template = null;
@@ -408,6 +407,36 @@ public class ControllerServlet extends VelocityServlet {
 		String requestedURL = Utilities.getRequestedURL(request);
 		ctx.put("currentURL", requestedURL);
 		ctx.put("currentRequest", request);
+
+		getClientIpAddr(request);
+	}
+
+	public static String getClientIpAddr(HttpServletRequest request) {
+		log.info("local ipAddress:" + request.getLocalAddr());
+		log.info("remote ipAddress:" + request.getRemoteAddr());
+
+		String ip = request.getHeader("X-Forwarded-For");
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("Proxy-Client-IP");
+			log.info("Proxy-Client-IP:" + ip);
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("WL-Proxy-Client-IP");
+			log.info("WL-Proxy-Client-IP:" + ip);
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("HTTP_CLIENT_IP");
+			log.info("HTTP_CLIENT_IP:" + ip);
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+			log.info("HTTP_X_FORWARDED_FOR:" + ip);
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getRemoteAddr();
+			log.info("unknown:" + ip);
+		}
+		return ip;
 	}
 
 	private void showHeader(Context ctx, String template) {
@@ -425,7 +454,6 @@ public class ControllerServlet extends VelocityServlet {
 
 	@Override
 	public void init() throws ServletException {
-		// TODO Auto-generated method stub
 		super.init();
 		String prefix = getServletContext().getRealPath("/");
 		String file = getInitParameter("log4j-init-file");
@@ -434,10 +462,10 @@ public class ControllerServlet extends VelocityServlet {
 		// trying
 		if (file != null) {
 			PropertyConfigurator.configure(prefix + file);
-			System.out.println("Log4J Logging started: " + prefix + file);
+			log.info("Log4J Logging started: " + prefix + file);
 		} else {
-			System.out.println("Log4J Is not configured for your Application: "
-					+ prefix + file);
+			log.warn("Log4J Is not configured for your Application: " + prefix
+					+ file);
 		}
 	}
 

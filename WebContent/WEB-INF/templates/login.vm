@@ -9,7 +9,7 @@
 		</font>
 	</div>
 	
-	<div class="well well-large" id="signin-div" style="display:none; width:40%; height:50%; float:right; margin-right:15px; ">
+	<div class="well well-large navbar navbar-inner shadow" id="signin-div" style="display:none; width:40%; height:50%; float:right; margin-right:15px; ">
 		<form id="signinform" action="${servletPageWithAction}login" method="POST">
 			<div>
 				<div style="float:left"><p class="lead">Sign in</p></div>
@@ -36,7 +36,7 @@
 		</form>
 	</div>
 	
-	<div class="well well-large" id="signup-div" style="display:none; width:40%; height:70%; float:right; margin-right:15px">
+	<div class="well well-large navbar navbar-inner shadow" id="signup-div" style="display:none; width:40%; height:70%; float:right; margin-right:15px">
 		<form id="signupform" action="${servletPageWithAction}signup" method="POST">
 			<div>
 				<div style="float:left"><p class="lead">Sign up</p></div>
